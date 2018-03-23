@@ -1,29 +1,33 @@
 <?php
 return [
+        'view_manager' => [
+                'template_path_stack' => [
+                        OMEKA_PATH . '/modules/RestrictedSites/view'
+                ]
+        ],
         'controllers' => [
-                'invokables' => [
-                        'RestrictedSites\Controller\Site\Index' => RestrictedSites\Controller\Site\IndexController::class,
-                        'RestrictedSites\Controller\Site\Page' => \Omeka\Controller\Site\PageController::class
+                'factories' => [
+                        'RestrictedSites\Controller\Site\SiteLogin' => RestrictedSites\Service\Controller\Site\SiteLoginControllerFactory::class
                 ]
         ],
         'router' => [
                 'routes' => [
-                        'site' => [
+                        'sitelogin' => [
                                 'type' => 'Segment',
                                 'options' => [
-                                        'route' => '/s/:site-slug',
+                                        'route' => '/sitelogin/:site-slug',
                                         'constraints' => [
                                                 'site-slug' => '[a-zA-Z0-9_-]+'
                                         ],
                                         'defaults' => [
                                                 '__NAMESPACE__' => 'RestrictedSites\Controller\Site',
                                                 '__SITE__' => true,
-                                                'controller' => 'Index',
-                                                'action' => 'index'
+                                                'controller' => 'SiteLogin',
+                                                'action' => 'login'
                                         ]
                                 ]
                         ]
                 ]
         ]
-]
-;
+];
+
