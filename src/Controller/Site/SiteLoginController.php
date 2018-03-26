@@ -1,20 +1,20 @@
 <?php
 namespace RestrictedSites\Controller\Site;
-use Doctrine\ORM\EntityManager;
 use Omeka\Form\LoginForm;
 use Zend\Authentication\AuthenticationService;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Session\Container;
 use Zend\View\Model\ViewModel;
 
+/**
+ * Provides controller sitelogin and action login for managing acess to sites
+ * marked as restricted to a limited user list
+ *
+ * @author laurent
+ *        
+ */
 class SiteLoginController extends AbstractActionController
 {
-
-    /**
-     *
-     * @var EntityManager
-     */
-    protected $entityManager;
 
     /**
      *
@@ -23,30 +23,50 @@ class SiteLoginController extends AbstractActionController
     protected $auth;
 
     /**
+     * Data required by the factory to instantiate controller
      *
      * @param EntityManager $entityManager            
      * @param AuthenticationService $auth            
      */
-    public function __construct (EntityManager $entityManager, 
-            AuthenticationService $auth)
+    public function __construct (AuthenticationService $auth)
     {
-        $this->entityManager = $entityManager;
         $this->auth = $auth;
     }
 
+    /**
+     * Unique login action to display Login form and handle login procedure.
+     * Returns with "Forbidden" code 403 for non-authorized users.
+     *
+     * @return \Zend\View\Model\ViewModel
+     */
     public function loginAction ()
     {
         /** @var \Omeka\Api\Representation\SiteRepresentation $site */
         $site = $this->currentSite();
         $siteSlug = $site->slug();
+        // TODO: handle access to non existing site
         
         if ($this->auth->hasIdentity()) {
-            return $this->redirect()->toRoute('site', 
-                    array(
-                            'site-slug' => $siteSlug
-                    ));
+            
+            $userId = $this->auth->getIdentity()->getId();
+            $sitePermissions = $site->sitePermissions();
+            foreach ($sitePermissions as $sitePermission) {
+                /** @var \Omeka\Api\Representation\UserRepresentation $registeredUser */
+                $registeredUser = $sitePermission->user();
+                $registeredUserId = $registeredUser->id();
+                if ($registeredUserId == $userId)
+                    // Authorized user, redirecting to site.
+                    return $this->redirect()->toRoute('site', 
+                            array(
+                                    'site-slug' => $siteSlug
+                            ));
+            }
+            // Non authorized user, sending Forbidden error code
+            $this->response->setStatusCode(403);
+            $this->messenger()->addError('Forbidden'); // @translate
         }
         
+        // Anonymous user, display and handle login form
         /** @var Omeka\Form\LoginForm $form */
         $form = $this->getForm(LoginForm::class);
         
@@ -62,7 +82,8 @@ class SiteLoginController extends AbstractActionController
                 $adapter->setCredential($validatedData['password']);
                 $result = $this->auth->authenticate();
                 if ($result->isValid()) {
-                    $this->messenger()->addSuccess('Successfully logged in'); // @translate
+                    // $this->messenger()->addSuccess('Successfully logged in');
+                    // // @translate
                     $session = $sessionManager->getStorage();
                     if ($redirectUrl = $session->offsetGet('redirect_url')) {
                         return $this->redirect()->toUrl($redirectUrl);
@@ -78,12 +99,12 @@ class SiteLoginController extends AbstractActionController
         
         /** @var \Zend\View\Model\ViewModel $view */
         $view = new ViewModel();
-        $view->setVariable('form', $form);      
+        $view->setVariable('form', $form);
         $view->setVariable('site', $site);
-        $view->setVariable('isLogin', true);
+        $view->setVariable('isLogin', true); // This variable is used to hide
+                                             // specific content on the login
+                                             // form (e.g. Search or Navigation
+                                             // menus).
         return $view;
     }
-    
-    // TODO : logout + modification de la barre supérieure
-    // TODO : forgot password -> redirection ?
 }

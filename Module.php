@@ -1,15 +1,14 @@
 <?php
 namespace RestrictedSites;
 use Omeka\Module\AbstractModule;
-use Zend\Mvc\Controller\AbstractController;
 use Zend\EventManager\EventInterface;
-use Zend\View\Renderer\PhpRenderer;
 use Omeka\Form\UserForm;
 use Zend\Mvc\MvcEvent;
 use Zend\EventManager\SharedEventManagerInterface;
 use Omeka\Permissions\Acl;
 use Zend\Session\Container;
 use Omeka\Settings\SiteSettings;
+use Omeka\Permissions\Exception\PermissionDeniedException;
 
 class Module extends AbstractModule
 {
@@ -35,16 +34,16 @@ class Module extends AbstractModule
     }
 
     /**
-     * Redirect all site requests to sitelogin route if user not logged in.
+     * Redirects all site requests to sitelogin route if site is restricted and
+     * user is not logged in.
      *
      * @param MvcEvent $event            
      * @return Zend\Http\PhpEnvironment\Response
      */
     public function redirectToSiteLogin (MvcEvent $event)
     {
-        // vérifier si user est dans la
-        // liste des utilisateurs du site
-        
+        // Filter on __SITE__ route identifier, and excluding sitelogin route to
+        // avoid redirection loops
         $routeMatch = $event->getRouteMatch();
         $route = $routeMatch->getMatchedRouteName();
         if ($routeMatch->getParam('__SITE__') && $route != 'sitelogin') {
@@ -52,7 +51,8 @@ class Module extends AbstractModule
             $serviceLocator = $event->getApplication()->getServiceManager();
             $api = $serviceLocator->get('Omeka\ApiManager');
             
-            // Récupération du site
+            // Fetching site information
+            // TODO: handle access to non existing site
             $siteSlug = $routeMatch->getParam('site-slug');
             $site = $api->read('sites', 
                     [
@@ -61,10 +61,10 @@ class Module extends AbstractModule
             
             /** @var \Omeka\Settings\SiteSettings $siteSettings */
             $siteSettings = $serviceLocator->get('Omeka\Settings\Site');
-
+            
             $restricted = $siteSettings->get('restricted', null, $site->id());
             if (! $restricted) {
-                return;
+                return; // Site is not restricted - exiting
             }
             
             $auth = $serviceLocator->get('Omeka\AuthenticationService');
@@ -73,20 +73,17 @@ class Module extends AbstractModule
                 $userId = $auth->getIdentity()->getId();
                 $sitePermissions = $site->sitePermissions();
                 foreach ($sitePermissions as $sitePermission) {
-                    /** @var \Omeka\Api\Representation\Omeka\Api\Representation\UserRepresentation $registeredUser */
+                    /** @var \Omeka\Api\Representation\UserRepresentation $registeredUser */
                     $registeredUser = $sitePermission->user();
                     $registeredUserId = $registeredUser->id();
                     if ($registeredUserId == $userId)
-                        return; // User is registered
+                        return; // User is registered as site authorized user -
+                                // exiting
                 }
-                
-                // User is not registerded for site
-                // TODO : redirect to forbidden
-                throw new \Exception("Acess denied to site"); 
-
             }
             
-            // Visitor : Redirect to site login form
+            // Anonymous visitor : redirecting to sitelogin/login
+            // TODO: Why not use $event::redirectToRoute?
             $url = $event->getRouter()->assemble(
                     [
                             'site-slug' => 'collection'
@@ -100,18 +97,33 @@ class Module extends AbstractModule
                         ->getUriString());
             $response = $event->getResponse();
             $response->getHeaders()->addHeaderLine('Location', $url);
-            $response->setStatusCode(302);
+            $response->setStatusCode(302); //redirect
             $response->sendHeaders();
             return $response;
         }
     }
-    
-    // Si non inclus, aucune config n'est chargée par défaut...
+
+    /**
+     * Include the configuration array containing the sitelogin controller, the
+     * sitelogin controller factory and the sitelogin route
+     *
+     * {@inheritDoc}
+     *
+     * @see \Omeka\Module\AbstractModule::getConfig()
+     */
     public function getConfig ()
     {
         return include __DIR__ . '/config/module.config.php';
     }
 
+    /**
+     * Called on module application bootstrap, this adds the required ACL level
+     * authorization for anybody to sue the sitelogin controller
+     *
+     * {@inheritDoc}
+     *
+     * @see \Omeka\Module\AbstractModule::onBootstrap()
+     */
     public function onBootstrap (MvcEvent $event)
     {
         parent::onBootstrap($event);
@@ -120,18 +132,21 @@ class Module extends AbstractModule
         $acl = $this->getServiceLocator()->get('Omeka\Acl');
         $acl->allow(null, 
                 [
-                        'RestrictedSites\Controller\Site\SiteLogin',
+                        'RestrictedSites\Controller\Site\SiteLogin'
                 ], null);
     }
 
+    /**
+     * Adds a Checkbox element to the site settings form
+     * This element is automatically handled by Omeka in the site_settings table
+     *
+     * @param EventInterface $event            
+     */
     public function addRestrictedSiteSetting (EventInterface $event)
     {
         /** @var \Omeka\Form\UserForm $form */
         $form = $event->getTarget();
         
-        // Ajoute un élément au formulaire de paramètres de sites
-        // Cet élément est traité automatiquement par Omeka dans une table
-        // site_settings
         $siteSettings = $form->getSiteSettings();
         $form->add(
                 array(

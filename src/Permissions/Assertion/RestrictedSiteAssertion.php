@@ -7,7 +7,12 @@ use Zend\Permissions\Acl\Role\RoleInterface;
 
 class RestrictedSiteAssertion implements AssertionInterface
 {
-
+/**
+ * Unused
+ * 
+ * {@inheritDoc}
+ * @see \Zend\Permissions\Acl\Assertion\AssertionInterface::assert()
+ */
     public function assert (Acl $acl, RoleInterface $role = null, 
             ResourceInterface $resource = null, $privilege = null)
     {
