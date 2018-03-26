@@ -14,11 +14,12 @@ class Module extends AbstractModule
 {
 
     /**
-     * Module body *
+     * Attach to Zend and Omeka specific listeners
      */
     public function attachListeners (
             SharedEventManagerInterface $sharedEventManager)
     {
+        // Attach to site settings form to add the module settings
         $sharedEventManager->attach('Omeka\Form\SiteSettingsForm', 
                 'form.add_elements', 
                 array(
@@ -26,6 +27,7 @@ class Module extends AbstractModule
                         'addRestrictedSiteSetting'
                 ));
         
+        // Attach to the router event to redirect to sitelogin
         $sharedEventManager->attach('*', MvcEvent::EVENT_ROUTE, 
                 [
                         $this,
@@ -78,7 +80,7 @@ class Module extends AbstractModule
                     $registeredUserId = $registeredUser->id();
                     if ($registeredUserId == $userId)
                         return; // User is registered as site authorized user -
-                                // exiting
+                                    // exiting
                 }
             }
             
@@ -97,7 +99,7 @@ class Module extends AbstractModule
                         ->getUriString());
             $response = $event->getResponse();
             $response->getHeaders()->addHeaderLine('Location', $url);
-            $response->setStatusCode(302); //redirect
+            $response->setStatusCode(302); // redirect
             $response->sendHeaders();
             return $response;
         }

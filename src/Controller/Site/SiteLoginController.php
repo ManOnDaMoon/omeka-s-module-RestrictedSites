@@ -5,6 +5,7 @@ use Zend\Authentication\AuthenticationService;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Session\Container;
 use Zend\View\Model\ViewModel;
+use Zend\Mvc\MvcEvent;
 
 /**
  * Provides controller sitelogin and action login for managing acess to sites
@@ -101,10 +102,12 @@ class SiteLoginController extends AbstractActionController
         $view = new ViewModel();
         $view->setVariable('form', $form);
         $view->setVariable('site', $site);
-        $view->setVariable('isLogin', true); // This variable is used to hide
-                                             // specific content on the login
-                                             // form (e.g. Search or Navigation
-                                             // menus).
+        /** @var MvcEvent $event */
+        $event = $this->event;
+        // This variable is used to hide specific content on the login form
+        // (e.g. Search or Navigation menus in top level view models):
+        $event->getViewModel()->setVariable('isLogin', true);
+        
         return $view;
     }
 }
