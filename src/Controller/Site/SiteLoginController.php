@@ -1,6 +1,6 @@
 <?php
 namespace RestrictedSites\Controller\Site;
-use Omeka\Form\LoginForm;
+use RestrictedSites\Form\SiteLoginForm;
 use Zend\Authentication\AuthenticationService;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Session\Container;
@@ -69,7 +69,7 @@ class SiteLoginController extends AbstractActionController
         
         // Anonymous user, display and handle login form
         /** @var Omeka\Form\LoginForm $form */
-        $form = $this->getForm(LoginForm::class);
+        $form = $this->getForm(SiteLoginForm::class);
         
         if ($this->getRequest()->isPost()) {
             $data = $this->getRequest()->getPost();
@@ -85,7 +85,13 @@ class SiteLoginController extends AbstractActionController
                 if ($result->isValid()) {
                     // $this->messenger()->addSuccess('Successfully logged in');
                     // // @translate
+                    /** @var \Zend\Session\Storage\SessionStorage $session */
                     $session = $sessionManager->getStorage();
+                    // Maximize session ttl to 30 days if "Remember me" is
+                    // checked:
+                    if ($validatedData['rememberme']) {
+                        $sessionManager->rememberMe(30 * 86400);
+                    }
                     if ($redirectUrl = $session->offsetGet('redirect_url')) {
                         return $this->redirect()->toUrl($redirectUrl);
                     }
