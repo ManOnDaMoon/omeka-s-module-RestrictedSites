@@ -25,7 +25,7 @@ Included features are:
 
 There is no configuration to the module.
 Once installed, go to your site settings page and check "Restrict access to registered user" to enable the module for a specific site.
-
+Then if necessary, edit the user list from the standard Site Users Settings page.
 
 ## Known issues
 
