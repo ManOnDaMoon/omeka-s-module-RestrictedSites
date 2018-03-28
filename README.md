@@ -45,4 +45,4 @@ Some code and logic based on other Omeka-S modules:
 
 ## Licensing
 
-The code in this project is licensed under GPLv3.
+The code in this project is licensed under LGPLv3.
