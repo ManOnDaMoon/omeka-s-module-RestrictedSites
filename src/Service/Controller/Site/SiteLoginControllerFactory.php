@@ -19,7 +19,7 @@ class SiteLoginControllerFactory implements FactoryInterface
             array $options = null)
     {
         $authenticationService = $services->get('Omeka\AuthenticationService');
-        // $entityManager = $services->get('Omeka\EntityManager');
+
         $controller = new SiteLoginController($authenticationService);
         return $controller;
     }

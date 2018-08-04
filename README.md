@@ -29,8 +29,7 @@ Then if necessary, edit the user list from the standard Site Users Settings page
 
 ## Known issues
 
-* Currently this module does not work as is with omeka-s 1.1.0 + php7 because of the use of SessionManager::rememberMe. For this to work you need to update `vendor/zendframework/zend-session` to their latest release from https://github.com/zendframework/zend-session
-
+None at the moment.
 
 ## Contributing
 
