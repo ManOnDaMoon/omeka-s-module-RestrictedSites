@@ -44,9 +44,8 @@ class SiteLoginController extends AbstractActionController
     public function loginAction ()
     {
         /** @var \Omeka\Api\Representation\SiteRepresentation $site */
-        $site = $this->currentSite();
+        $site = $this->currentSite(); // TODO: get default site if $site empty
         $siteSlug = $site->slug();
-        // TODO: handle access to non existing site
         
         if ($this->auth->hasIdentity()) {
             
@@ -70,11 +69,7 @@ class SiteLoginController extends AbstractActionController
         
         // Anonymous user, display and handle login form
         /** @var Omeka\Form\LoginForm $form */
-        $form = $this->getForm(SiteLoginForm::class); // TODO: Fixme after
-                                                      // Zend update
-                                                      // $form =
-                                                      // $this->getForm(LoginForm::class);
-        
+        $form = $this->getForm(SiteLoginForm::class);
         if ($this->getRequest()->isPost()) {
             $data = $this->getRequest()->getPost();
             $form->setData($data);
@@ -87,13 +82,12 @@ class SiteLoginController extends AbstractActionController
                 $adapter->setCredential($validatedData['password']);
                 $result = $this->auth->authenticate();
                 if ($result->isValid()) {
-                    // $this->messenger()->addSuccess('Successfully logged in');
-                    // // @translate
+                    
                     /** @var \Zend\Session\Storage\SessionStorage $session */
                     $session = $sessionManager->getStorage();
+                    
                     // Maximize session ttl to 30 days if "Remember me" is
                     // checked:
-                    // TODO: Fixme after Zend update - not working with php7
                     if ($validatedData['rememberme']) {
                         $sessionManager->rememberMe(30 * 86400);
                     }
@@ -113,12 +107,16 @@ class SiteLoginController extends AbstractActionController
         $view = new ViewModel();
         $view->setVariable('form', $form);
         $view->setVariable('site', $site);
+
         /** @var MvcEvent $event */
         $event = $this->event;
+
         // This variable is used to hide specific content on the login form
         // (e.g. Search or Navigation menus in top level view models):
         $event->getViewModel()->setVariable('isLogin', true);
         
         return $view;
     }
+
+    // TODO : Redirect to sitelogin, not admin login
 }
