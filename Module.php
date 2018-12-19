@@ -88,7 +88,7 @@ class Module extends AbstractModule
             // TODO: Why not use $event::redirectToRoute?
             $url = $event->getRouter()->assemble(
                     [
-                            'site-slug' => 'collection'
+                            'site-slug' => $siteSlug
                     ], 
                     [
                             'name' => 'sitelogin'
