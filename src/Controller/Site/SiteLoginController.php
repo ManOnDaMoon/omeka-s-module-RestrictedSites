@@ -1,5 +1,6 @@
 <?php
 namespace RestrictedSites\Controller\Site;
+
 use RestrictedSites\Form\SiteLoginForm;
 use Omeka\Form\LoginForm;
 use Zend\Authentication\AuthenticationService;
@@ -30,7 +31,7 @@ class SiteLoginController extends AbstractActionController
      * @param EntityManager $entityManager            
      * @param AuthenticationService $auth            
      */
-    public function __construct (AuthenticationService $auth)
+    public function __construct(AuthenticationService $auth)
     {
         $this->auth = $auth;
     }
@@ -41,7 +42,7 @@ class SiteLoginController extends AbstractActionController
      *
      * @return \Zend\View\Model\ViewModel
      */
-    public function loginAction ()
+    public function loginAction()
     {
         /** @var \Omeka\Api\Representation\SiteRepresentation $site */
         $site = $this->currentSite(); // TODO: get default site if $site empty
@@ -57,10 +58,9 @@ class SiteLoginController extends AbstractActionController
                 $registeredUserId = $registeredUser->id();
                 if ($registeredUserId == $userId)
                     // Authorized user, redirecting to site.
-                    return $this->redirect()->toRoute('site', 
-                            array(
-                                    'site-slug' => $siteSlug
-                            ));
+                    return $this->redirect()->toRoute('site', array(
+                        'site-slug' => $siteSlug
+                    ));
             }
             // Non authorized user, sending Forbidden error code
             $this->response->setStatusCode(403);
@@ -94,7 +94,9 @@ class SiteLoginController extends AbstractActionController
                     if ($redirectUrl = $session->offsetGet('redirect_url')) {
                         return $this->redirect()->toUrl($redirectUrl);
                     }
-                    return $this->redirect()->toRoute('site');
+                    return $this->redirect()->toRoute('site', array(
+                        'site-slug' => $siteSlug
+                    ));
                 } else {
                     $this->messenger()->addError('Email or password is invalid'); // @translate
                 }
@@ -107,16 +109,16 @@ class SiteLoginController extends AbstractActionController
         $view = new ViewModel();
         $view->setVariable('form', $form);
         $view->setVariable('site', $site);
-
+        
         /** @var MvcEvent $event */
         $event = $this->event;
-
+        
         // This variable is used to hide specific content on the login form
         // (e.g. Search or Navigation menus in top level view models):
         $event->getViewModel()->setVariable('isLogin', true);
         
         return $view;
     }
-
+    
     // TODO : Redirect to sitelogin, not admin login
 }
