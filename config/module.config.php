@@ -10,6 +10,11 @@ return [
                         'RestrictedSites\Controller\Site\SiteLogin' => RestrictedSites\Service\Controller\Site\SiteLoginControllerFactory::class
                 ]
         ],
+        'navigation_links' => [
+                'invokables' => [
+                    'RestrictedSites\Site\Navigation\Link\Logout' => RestrictedSites\Site\Navigation\Link\Logout::class
+                    ],
+        ],
         'router' => [
                 'routes' => [
                         'sitelogin' => [
