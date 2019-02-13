@@ -20,15 +20,15 @@ class Module extends AbstractModule
             SharedEventManagerInterface $sharedEventManager)
     {
         // Attach to site settings form to add the module settings
-        $sharedEventManager->attach('Omeka\Form\SiteSettingsForm', 
-                'form.add_elements', 
+        $sharedEventManager->attach('Omeka\Form\SiteSettingsForm',
+                'form.add_elements',
                 array(
                         $this,
                         'addRestrictedSiteSetting'
                 ));
-        
+
         // Attach to the router event to redirect to sitelogin
-        $sharedEventManager->attach('*', MvcEvent::EVENT_ROUTE, 
+        $sharedEventManager->attach('*', MvcEvent::EVENT_ROUTE,
                 [
                         $this,
                         'redirectToSiteLogin'
@@ -39,7 +39,7 @@ class Module extends AbstractModule
      * Redirects all site requests to sitelogin route if site is restricted and
      * user is not logged in.
      *
-     * @param MvcEvent $event            
+     * @param MvcEvent $event
      * @return Zend\Http\PhpEnvironment\Response
      */
     public function redirectToSiteLogin (MvcEvent $event)
@@ -49,26 +49,26 @@ class Module extends AbstractModule
         $routeMatch = $event->getRouteMatch();
         $route = $routeMatch->getMatchedRouteName();
         if ($routeMatch->getParam('__SITE__') && $route != 'sitelogin') {
-            
+
             $serviceLocator = $event->getApplication()->getServiceManager();
             $api = $serviceLocator->get('Omeka\ApiManager');
-            
+
             // Fetching site information
-            // TODO: handle access to non existing site
+            // Omeka MVC handles cases where site does not exist or is not provided
             $siteSlug = $routeMatch->getParam('site-slug');
-            $site = $api->read('sites', 
+            $site = $api->read('sites',
                     [
                             'slug' => $siteSlug
                     ])->getContent();
-            
+
             /** @var \Omeka\Settings\SiteSettings $siteSettings */
             $siteSettings = $serviceLocator->get('Omeka\Settings\Site');
-            
+
             $restricted = $siteSettings->get('restricted', null, $site->id());
             if (! $restricted) {
                 return; // Site is not restricted - exiting
             }
-            
+
             $auth = $serviceLocator->get('Omeka\AuthenticationService');
             if ($auth->hasIdentity()) {
                 // Authenticated user. Checking for site registration.
@@ -83,18 +83,17 @@ class Module extends AbstractModule
                                     // exiting
                 }
             }
-            
+
             // Anonymous visitor : redirecting to sitelogin/login
-            // TODO: Why not use $event::redirectToRoute?
             $url = $event->getRouter()->assemble(
                     [
                             'site-slug' => $siteSlug
-                    ], 
+                    ],
                     [
                             'name' => 'sitelogin'
                     ]);
             $session = Container::getDefaultManager()->getStorage();
-            $session->offsetSet('redirect_url', 
+            $session->offsetSet('redirect_url',
                     $event->getRequest()
                         ->getUriString());
             $response = $event->getResponse();
@@ -129,10 +128,10 @@ class Module extends AbstractModule
     public function onBootstrap (MvcEvent $event)
     {
         parent::onBootstrap($event);
-        
+
         /** @var Acl $acl */
         $acl = $this->getServiceLocator()->get('Omeka\Acl');
-        $acl->allow(null, 
+        $acl->allow(null,
                 [
                         'RestrictedSites\Controller\Site\SiteLogin'
                 ], null);
@@ -142,13 +141,13 @@ class Module extends AbstractModule
      * Adds a Checkbox element to the site settings form
      * This element is automatically handled by Omeka in the site_settings table
      *
-     * @param EventInterface $event            
+     * @param EventInterface $event
      */
     public function addRestrictedSiteSetting (EventInterface $event)
     {
         /** @var \Omeka\Form\UserForm $form */
         $form = $event->getTarget();
-        
+
         $siteSettings = $form->getSiteSettings();
         $form->add(
                 array(

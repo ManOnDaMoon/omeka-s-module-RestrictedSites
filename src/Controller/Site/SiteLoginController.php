@@ -14,7 +14,7 @@ use Zend\Mvc\MvcEvent;
  * marked as restricted to a limited user list
  *
  * @author laurent
- *        
+ *
  */
 class SiteLoginController extends AbstractActionController
 {
@@ -28,8 +28,8 @@ class SiteLoginController extends AbstractActionController
     /**
      * Data required by the factory to instantiate controller
      *
-     * @param EntityManager $entityManager            
-     * @param AuthenticationService $auth            
+     * @param EntityManager $entityManager
+     * @param AuthenticationService $auth
      */
     public function __construct(AuthenticationService $auth)
     {
@@ -45,11 +45,11 @@ class SiteLoginController extends AbstractActionController
     public function loginAction()
     {
         /** @var \Omeka\Api\Representation\SiteRepresentation $site */
-        $site = $this->currentSite(); // TODO: get default site if $site empty
+        $site = $this->currentSite(); // Omeka MVC handles cases where site does not exist or is not provided
         $siteSlug = $site->slug();
-        
+
         if ($this->auth->hasIdentity()) {
-            
+
             $userId = $this->auth->getIdentity()->getId();
             $sitePermissions = $site->sitePermissions();
             foreach ($sitePermissions as $sitePermission) {
@@ -66,7 +66,7 @@ class SiteLoginController extends AbstractActionController
             $this->response->setStatusCode(403);
             $this->messenger()->addError('Forbidden'); // @translate
         }
-        
+
         // Anonymous user, display and handle login form
         /** @var Omeka\Form\LoginForm $form */
         $form = $this->getForm(SiteLoginForm::class);
@@ -82,10 +82,10 @@ class SiteLoginController extends AbstractActionController
                 $adapter->setCredential($validatedData['password']);
                 $result = $this->auth->authenticate();
                 if ($result->isValid()) {
-                    
+
                     /** @var \Zend\Session\Storage\SessionStorage $session */
                     $session = $sessionManager->getStorage();
-                    
+
                     // Maximize session ttl to 30 days if "Remember me" is
                     // checked:
                     if ($validatedData['rememberme']) {
@@ -104,21 +104,40 @@ class SiteLoginController extends AbstractActionController
                 $this->messenger()->addFormErrors($form);
             }
         }
-        
+
         /** @var \Zend\View\Model\ViewModel $view */
         $view = new ViewModel();
         $view->setVariable('form', $form);
         $view->setVariable('site', $site);
-        
+
         /** @var MvcEvent $event */
         $event = $this->event;
-        
+
         // This variable is used to hide specific content on the login form
         // (e.g. Search or Navigation menus in top level view models):
         $event->getViewModel()->setVariable('isLogin', true);
-        
+
         return $view;
     }
-    
-    // TODO : Redirect to sitelogin, not admin login
+
+    public function logoutAction()
+    {
+        /** @var \Omeka\Api\Representation\SiteRepresentation $site */
+        $site = $this->currentSite(); // Omeka MVC handles cases where site does not exist or is not provided
+        $siteSlug = $site->slug();
+
+        $this->auth->clearIdentity();
+
+        $sessionManager = Container::getDefaultManager();
+
+        $eventManager = $this->getEventManager();
+        $eventManager->trigger('user.logout');
+
+        $sessionManager->destroy();
+
+        $this->messenger()->addError('Successfully logged out'); // @translate
+        return $this->redirect()->toRoute('sitelogin', array(
+            'site-slug' => $siteSlug
+        ));
+    }
 }
