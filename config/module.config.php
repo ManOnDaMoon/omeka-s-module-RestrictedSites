@@ -17,10 +17,12 @@ return [
         ],
         'translator' => [
                 'translation_file_patterns' => [
-                        'type' => 'gettext',
-                        'base_dir' => dirname(__DIR__) . '/language',
-                        'pattern' => '%s.mo',
-                        'text_domain' => null,
+                        [
+                            'type' => 'gettext',
+                            'base_dir' => OMEKA_PATH . '/modules/RestrictedSites/language',
+                            'pattern' => '%s.mo',
+                            'text_domain' => null,
+                        ],
                 ],
         ],
         'router' => [
