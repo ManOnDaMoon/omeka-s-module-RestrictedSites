@@ -48,7 +48,7 @@ class Logout implements LinkInterface
      */
     public function getLabel(array $data, SiteRepresentation $site)
     {
-        return "Logout"; // @translate
+        return "Log out"; // @translate
     }
 
     /**
