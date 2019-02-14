@@ -1,7 +1,7 @@
 <?php
 $this->htmlElement('body')->appendAttribute('class', 'login');
 ?>
-<h1><?php echo $this->translate('Log in'); //FIXME à remonter en issue sur github Login -> Log in?></h1>
+<h1><?php echo $this->translate('Log in'); ?></h1>
 <?php echo $this->messages(); ?>
 <?php echo $this->form($form); ?>
 <p class="forgot-password"><?php echo $this->hyperlink($this->translate('Forgot password?'), $this->url('forgot-password')); ?></p>

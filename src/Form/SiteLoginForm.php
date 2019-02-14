@@ -11,7 +11,7 @@ use Omeka\Form\LoginForm;
  * LoginForm is that we don't have control on the form elements order
  *
  * @author laurent
- *        
+ *
  */
 class SiteLoginForm extends LoginForm
 {
@@ -24,8 +24,8 @@ class SiteLoginForm extends LoginForm
                         'name' => 'email',
                         'type' => 'Email',
                         'options' => [
-                                'label' => 'Email'
-                        ], // @translate
+                                'label' => 'Email' // @translate
+                        ],
                         'attributes' => [
                                 'required' => true
                         ]
@@ -35,36 +35,36 @@ class SiteLoginForm extends LoginForm
                         'name' => 'password',
                         'type' => 'Password',
                         'options' => [
-                                'label' => 'Password'
-                        ], // @translate
+                                'label' => 'Password' // @translate
+                        ],
                         'attributes' => [
                                 'required' => true
                         ]
                 ]);
-        
+
         // New "Remember me" checkbox element
         $this->add(
                 array(
                         'name' => 'rememberme',
                         'type' => 'Checkbox',
                         'options' => array(
-                                'label' => 'Rester connecté'
-                        ) // @translate
+                                'label' => 'Remember me' // @translate
+                        )
 ,
                         'attributes' => array()
                 ));
-        
+
         $this->add(
                 [
                         'name' => 'submit',
                         'type' => 'Submit',
                         'attributes' => [
-                                'value' => 'Log in'
+                                'value' => 'Log in' // @translate
                         ]
-                ]) // @translate
+                ])
 
         ;
-        
+
         $inputFilter = $this->getInputFilter();
         $inputFilter->add(
                 [
