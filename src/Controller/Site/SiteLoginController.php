@@ -135,6 +135,7 @@ class SiteLoginController extends AbstractActionController
 
         $sessionManager->destroy();
 
+        // FIXME :
         $this->messenger()->addError('Successfully logged out'); // @translate
         return $this->redirect()->toRoute('sitelogin', array(
             'site-slug' => $siteSlug
