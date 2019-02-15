@@ -18,7 +18,9 @@ Anonymous users are redirected to a standard public-facing login page, without t
 This module includes the following features:
 * Restrict access of public sites to a list of registered users
 * Public-facing login form included in your public site theme, including a checkbox option to remember the user session
+* Custom Log out link that does not redirect to admin backend
 * Ability to hide features (e.g. search form) from anonymous user
+* Built-in EN and FR localization
 
 ### Restrict access of public sites
 
@@ -56,6 +58,9 @@ The module includes a default login form. If you want to customize this form to 
 
 #### Conditional display for login users
 A conditional `$isLogin` variable is set by the login controller and available in order to hide specific items from public facing view, e.g. search forms.
+
+### Custom log out link
+A custom log out link is available in your site `Navigation` configuration. This link terminates the user's session and redirects to the site login form, but does not display the admin backend login form.
 
 ## Module configuration
 
