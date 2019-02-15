@@ -25,7 +25,7 @@ class Logout implements LinkInterface
      */
     public function getFormTemplate()
     {
-        return '';
+        return 'restricted-sites/navigation-link-form/logout-link';
     }
 
     /**
@@ -48,7 +48,7 @@ class Logout implements LinkInterface
      */
     public function getLabel(array $data, SiteRepresentation $site)
     {
-        return "Log out"; // @translate
+        return isset($data['label']) && '' !== trim($data['label']) ? $data['label'] : null;
     }
 
     /**
@@ -77,6 +77,8 @@ class Logout implements LinkInterface
      */
     public function toJstree(array $data, SiteRepresentation $site)
     {
-        return array();
+        return [
+            'label' => $data['label']
+        ];
     }
 }
