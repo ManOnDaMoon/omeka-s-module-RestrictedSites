@@ -154,7 +154,7 @@ class Module extends AbstractModule
                         'name' => 'restricted',
                         'type' => 'Checkbox',
                         'options' => array(
-                                'label' => 'Restrict access to site user list'
+                                'label' => 'Restrict access to site user list' // @translate
                         ),
                         'attributes' => array(
                                 'value' => (bool) $siteSettings->get(
