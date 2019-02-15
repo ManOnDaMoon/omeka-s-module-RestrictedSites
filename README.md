@@ -59,6 +59,12 @@ The module includes a default login form. If you want to customize this form to 
 #### Conditional display for login users
 A conditional `$isLogin` variable is set by the login controller and available in order to hide specific items from public facing view, e.g. search forms.
 
+To do so, in any view template, surround the elements you want to hide to non-registered users with the following conditional:
+
+`<?php if (!isset($isLogin)):?>
+[...]
+<?php endif; ?>`
+
 ### Custom log out link
 A custom log out link is available in your site `Navigation` configuration. This link terminates the user's session and redirects to the site login form, but does not display the admin backend login form.
 
