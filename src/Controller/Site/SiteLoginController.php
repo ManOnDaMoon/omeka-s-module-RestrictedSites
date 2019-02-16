@@ -113,7 +113,7 @@ class SiteLoginController extends AbstractActionController
         /** @var MvcEvent $event */
         $event = $this->event;
 
-        // This variable is used to hide specific content on the login form
+        // This variable is used to hide specific content to unregistered users
         // (e.g. Search or Navigation menus in top level view models):
         $event->getViewModel()->setVariable('isLogin', true);
 
@@ -122,23 +122,31 @@ class SiteLoginController extends AbstractActionController
 
     public function logoutAction()
     {
-        /** @var \Omeka\Api\Representation\SiteRepresentation $site */
-        $site = $this->currentSite(); // Omeka MVC handles cases where site does not exist or is not provided
-        $siteSlug = $site->slug();
+        if ($this->auth->hasIdentity()) {
 
-        $this->auth->clearIdentity();
+            $this->auth->clearIdentity();
+            /** @var \Zend\Session\SessionManager $sessionManager */
+            $sessionManager = Container::getDefaultManager();
 
-        $sessionManager = Container::getDefaultManager();
+            $eventManager = $this->getEventManager();
+            $eventManager->trigger('user.logout');
 
-        $eventManager = $this->getEventManager();
-        $eventManager->trigger('user.logout');
+            $sessionManager->destroy();
 
-        $sessionManager->destroy();
+            // At this point, user is logged out. Prepare login page.
+            $this->messenger()->addSuccess('Successfully logged out'); // @translate
 
-        // FIXME :
-        $this->messenger()->addError('Successfully logged out'); // @translate
-        return $this->redirect()->toRoute('sitelogin', array(
-            'site-slug' => $siteSlug
-        ));
+        } else {
+            // Visitor not logged in, redirect to home page
+            $this->redirect()->toRoute('site', array('site-slug' => $this->currentSite()->slug()));
+        }
+
+        /** @var \Zend\View\Model\ViewModel $view */
+        $view = new ViewModel();
+        $view->setVariable('site', $this->currentSite());
+        // This variable is used to hide specific content to unregistered users
+        // (e.g. Search or Navigation menus in top level view models):
+        $view->setVariable('isLogin', true);
+        return $view;
     }
 }

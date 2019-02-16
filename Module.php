@@ -13,6 +13,8 @@ use Omeka\Permissions\Exception\PermissionDeniedException;
 class Module extends AbstractModule
 {
 
+    protected $excludedRoutes = array('sitelogin', 'sitelogout');
+
     /**
      * Attach to Zend and Omeka specific listeners
      */
@@ -48,7 +50,7 @@ class Module extends AbstractModule
         // avoid redirection loops
         $routeMatch = $event->getRouteMatch();
         $route = $routeMatch->getMatchedRouteName();
-        if ($routeMatch->getParam('__SITE__') && $route != 'sitelogin') {
+        if ($routeMatch->getParam('__SITE__') && !in_array($route, $this->excludedRoutes)) {
 
             $serviceLocator = $event->getApplication()->getServiceManager();
             $api = $serviceLocator->get('Omeka\ApiManager');
