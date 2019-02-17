@@ -32,3 +32,7 @@ msgstr "Restreindre l'accès au site et limiter aux utilisateurs configurés"
 #: view/restricted-sites/site/site-login/logout.phtml:6
 msgid "Back to homepage"
 msgstr "Retourner à la page d'accueil"
+
+#: Module.php:159
+msgid "Restricted Sites"
+msgstr "Sites restreints"
