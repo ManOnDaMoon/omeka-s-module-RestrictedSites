@@ -151,7 +151,18 @@ class Module extends AbstractModule
         $form = $event->getTarget();
 
         $siteSettings = $form->getSiteSettings();
-        $form->add(
+
+        $form->add([
+            'type' => 'fieldset',
+            'name' => 'restrictedsites',
+            'options' => [
+                'label' => 'Restricted Sites', // @translate
+            ],
+        ]);
+
+        $rsFieldset = $form->get('restrictedsites');
+
+        $rsFieldset->add(
                 array(
                         'name' => 'restricted',
                         'type' => 'Checkbox',
