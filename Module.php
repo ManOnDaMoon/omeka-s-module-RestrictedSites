@@ -32,7 +32,7 @@ class Module extends AbstractModule
         $sharedEventManager->attach('*', MvcEvent::EVENT_ROUTE, [
             $this,
             'redirectToSiteLogin'
-        ], 1000);
+        ]);
     }
 
     /**
