@@ -8,7 +8,6 @@ use Zend\EventManager\SharedEventManagerInterface;
 use Omeka\Permissions\Acl;
 use Zend\Session\Container;
 use Omeka\Settings\SiteSettings;
-use Omeka\Permissions\Exception\PermissionDeniedException;
 
 class Module extends AbstractModule
 {
@@ -30,11 +29,10 @@ class Module extends AbstractModule
                 ));
 
         // Attach to the router event to redirect to sitelogin
-        $sharedEventManager->attach('*', MvcEvent::EVENT_ROUTE,
-                [
-                        $this,
-                        'redirectToSiteLogin'
-                ]);
+        $sharedEventManager->attach('*', MvcEvent::EVENT_ROUTE, [
+            $this,
+            'redirectToSiteLogin'
+        ], 1000);
     }
 
     /**
@@ -121,7 +119,7 @@ class Module extends AbstractModule
 
     /**
      * Called on module application bootstrap, this adds the required ACL level
-     * authorization for anybody to sue the sitelogin controller
+     * authorization for anybody to use the sitelogin controller
      *
      * {@inheritDoc}
      *
@@ -159,6 +157,8 @@ class Module extends AbstractModule
                 'label' => 'Restricted Sites', // @translate
             ],
         ]);
+
+        // TODO : Check for site visibility setting and warn if set to private
 
         $rsFieldset = $form->get('restrictedsites');
 
