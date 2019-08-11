@@ -8,6 +8,8 @@ Anonymous users are redirected to a standard public-facing login page, without t
 
 ## Installing / Getting started
 
+RestrictedSites is compatible with Omeka-S v2.
+
 * Download and unzip in your `omeka-s/modules` directory.
 * Rename the uncompressed folder to `RestrictedSites`.
 * Log into your Omeka-S admin backend and navigate to the `Modules` menu.
