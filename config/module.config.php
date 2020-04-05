@@ -7,8 +7,19 @@ return [
         ],
         'controllers' => [
                 'factories' => [
-                        'RestrictedSites\Controller\Site\SiteLogin' => RestrictedSites\Service\Controller\Site\SiteLoginControllerFactory::class
+                        'RestrictedSites\Controller\Site\SiteLogin' => RestrictedSites\Service\Controller\Site\SiteLoginControllerFactory::class,
+                        'RestrictedSites\Stdlib\SiteMailer' => RestrictedSites\Service\SiteMailerFactory::class,
                 ]
+        ],
+        'service_manager' => [
+            'factories' => [
+                'RestricedSites\SiteMailer' => RestrictedSites\Service\SiteMailerFactory::class,
+            ]
+        ],
+        'controller_plugins' => [
+            'factories' => [
+                'sitemailer' => RestrictedSites\Service\ControllerPlugin\SiteMailerFactory::class,
+            ],
         ],
         'navigation_links' => [
                 'invokables' => [
@@ -53,6 +64,22 @@ return [
                                             'constraints' => [
                                                 'controller' => 'SiteLogin',
                                                 'action' => 'forgotPassword',
+                                            ],
+                                        ],
+                                    ],
+                                    'create-password' => [
+                                        'type' => \Zend\Router\Http\Segment::class,
+                                        'options' => [
+                                            'route' => '/create-password/:key',
+                                            'constraints' => [
+                                                'key' => '[a-zA-Z0-9]+',
+                                            ],
+                                            'defaults' => [
+                                                'action' => 'create-password',
+                                            ],
+                                            'constraints' => [
+                                                'controller' => 'SiteLogin',
+                                                'action' => 'createPassword',
                                             ],
                                         ],
                                     ],

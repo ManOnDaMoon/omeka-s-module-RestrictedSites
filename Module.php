@@ -12,7 +12,11 @@ use Omeka\Settings\SiteSettings;
 class Module extends AbstractModule
 {
 
-    protected $excludedRoutes = array('sitelogin', 'sitelogout');
+    protected $excludedRoutes = array('sitelogin',
+        'sitelogout',
+        'sitelogin/forgot-password',
+        'sitelogin/create-password'
+    );
 
     /**
      * Attach to Zend and Omeka specific listeners

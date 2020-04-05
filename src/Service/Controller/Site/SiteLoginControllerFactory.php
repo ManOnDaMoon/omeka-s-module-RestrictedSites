@@ -15,12 +15,11 @@ class SiteLoginControllerFactory implements FactoryInterface
      *
      * @see \Zend\ServiceManager\Factory\FactoryInterface::__invoke()
      */
-    public function __invoke (ContainerInterface $services, $requestedName, 
-            array $options = null)
+    public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
     {
-        $authenticationService = $services->get('Omeka\AuthenticationService');
-
-        $controller = new SiteLoginController($authenticationService);
-        return $controller;
+        return new SiteLoginController(
+            $services->get('Omeka\EntityManager'),
+            $services->get('Omeka\AuthenticationService')
+        );
     }
 }

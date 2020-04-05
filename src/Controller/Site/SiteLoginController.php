@@ -2,6 +2,7 @@
 namespace RestrictedSites\Controller\Site;
 
 use RestrictedSites\Form\SiteLoginForm;
+use Doctrine\ORM\EntityManager;
 use Omeka\Form\LoginForm;
 use Zend\Authentication\AuthenticationService;
 use Zend\Mvc\Controller\AbstractActionController;
@@ -26,13 +27,19 @@ class SiteLoginController extends AbstractActionController
     protected $auth;
 
     /**
+     * @var EntityManager
+     */
+    protected $entityManager;
+
+    /**
      * Data required by the factory to instantiate controller
      *
      * @param EntityManager $entityManager
      * @param AuthenticationService $auth
      */
-    public function __construct(AuthenticationService $auth)
+    public function __construct(EntityManager $entityManager, AuthenticationService $auth)
     {
+        $this->entityManager = $entityManager;
         $this->auth = $auth;
     }
 
@@ -150,8 +157,93 @@ class SiteLoginController extends AbstractActionController
         return $view;
     }
 
+
     public function forgotPasswordAction()
     {
-        return;
+        if ($this->auth->hasIdentity()) {
+            return $this->redirect()->toRoute('admin'); // TODO Modify to redirect to site
+        }
+
+        $form = $this->getForm(\Omeka\Form\ForgotPasswordForm::class);
+
+        if ($this->getRequest()->isPost()) {
+            $data = $this->getRequest()->getPost();
+            $form->setData($data);
+            if ($form->isValid()) {
+                $user = $this->entityManager->getRepository('Omeka\Entity\User')
+                    ->findOneBy([
+                        'email' => $data['email'],
+                        'isActive' => true,
+                    ]);
+                if ($user) {
+                    $passwordCreation = $this->entityManager
+                        ->getRepository('Omeka\Entity\PasswordCreation')
+                        ->findOneBy(['user' => $user]);
+                    if ($passwordCreation) {
+                        $this->entityManager->remove($passwordCreation);
+                        $this->entityManager->flush();
+                    }
+                    $this->sitemailer()->sendSiteResetPassword($user); // TODO Modify link in email
+                }
+                $this->messenger()->addSuccess('Check your email for instructions on how to reset your password'); // @translate
+                return $this->redirect()->toRoute('site', array('site-slug' => $this->currentSite()->slug()));
+                return $this->redirect()->toRoute('login'); // Modify to redirect to sitelogin
+            } else {
+                $this->messenger()->addError('Activation unsuccessful'); // @translate
+            }
+        }
+
+        $view = new ViewModel;
+        $view->setVariable('form', $form);
+        return $view;
+    }
+
+    public function createPasswordAction()
+    {
+        if ($this->auth->hasIdentity()) {
+            return $this->redirect()->toRoute('admin'); //TODO Modify to redirect to site
+        }
+
+        $passwordCreation = $this->entityManager->find(
+            'Omeka\Entity\PasswordCreation',
+            $this->params('key')
+            );
+
+        if (!$passwordCreation) {
+            $this->messenger()->addError('Invalid password creation key.'); // @translate
+            return $this->redirect()->toRoute('login');
+        }
+        $user = $passwordCreation->getUser();
+
+        if (new DateTime > $passwordCreation->getExpiration()) {
+            $user->setIsActive(false);
+            $this->entityManager->remove($passwordCreation);
+            $this->entityManager->flush();
+            $this->messenger()->addError('Password creation key expired.'); // @translate
+            return $this->redirect()->toRoute('login'); // TODO modify to redirect to site
+        }
+
+        $form = $this->getForm(ActivateForm::class);
+
+        if ($this->getRequest()->isPost()) {
+            $data = $this->getRequest()->getPost();
+            $form->setData($data);
+            if ($form->isValid()) {
+                $user->setPassword($data['password-confirm']['password']);
+                if ($passwordCreation->activate()) {
+                    $user->setIsActive(true);
+                }
+                $this->entityManager->remove($passwordCreation);
+                $this->entityManager->flush();
+                $this->messenger()->addSuccess('Successfully created your password. Please log in.'); // @translate
+                return $this->redirect()->toRoute('login'); // TODO Modify to redirect to site
+            } else {
+                $this->messenger()->addError('Password creation unsuccessful'); // @translate
+            }
+        }
+
+        $view = new ViewModel;
+        $view->setVariable('form', $form);
+        return $view;
     }
 }
