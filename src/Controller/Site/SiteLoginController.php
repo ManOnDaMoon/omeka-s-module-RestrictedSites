@@ -149,4 +149,9 @@ class SiteLoginController extends AbstractActionController
         $view->setVariable('isLogin', true);
         return $view;
     }
+
+    public function forgotPasswordAction()
+    {
+        return;
+    }
 }

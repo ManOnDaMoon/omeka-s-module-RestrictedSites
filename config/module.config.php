@@ -28,7 +28,7 @@ return [
         'router' => [
                 'routes' => [
                         'sitelogin' => [
-                                'type' => 'Segment',
+                                'type' => \Zend\Router\Http\Segment::class,
                                 'options' => [
                                         'route' => '/sitelogin/:site-slug',
                                         'constraints' => [
@@ -40,7 +40,23 @@ return [
                                                 'controller' => 'SiteLogin',
                                                 'action' => 'login'
                                         ]
-                                ]
+                                ],
+                                'may_terminate' => true,
+                                'child_routes' => [
+                                    'forgot-password' => [
+                                        'type' => \Zend\Router\Http\Segment::class,
+                                        'options' => [
+                                            'route' => '/forgot-password',
+                                            'defaults' => [
+                                                'action' => 'forgot-password',
+                                            ],
+                                            'constraints' => [
+                                                'controller' => 'SiteLogin',
+                                                'action' => 'forgotPassword',
+                                            ],
+                                        ],
+                                    ],
+                                ],
                         ],
                         'sitelogout' => [
                                 'type' => 'Segment',

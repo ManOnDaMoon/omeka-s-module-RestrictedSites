@@ -5,6 +5,6 @@ $this->htmlElement('body')->appendAttribute('class', 'login');
 <?php echo $this->messages(); ?>
 <h1><?php echo $this->translate('Log in'); ?></h1>
 <?php echo $this->form($form); ?>
-<p class="forgot-password"><?php echo $this->hyperlink($this->translate('Forgot password?'), $this->url('forgot-password')); ?></p>
+<p class="forgot-password"><?php echo $this->hyperlink($this->translate('Forgot password?'), $this->url( 'sitelogin/forgot-password', ['controller' => 'sitelogin', 'action' => 'forgot-password', 'site-slug' => $site->slug()])); ?></p>
 </div>
 <?php $this->trigger('view.login.after'); ?>
