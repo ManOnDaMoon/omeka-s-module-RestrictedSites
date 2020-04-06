@@ -164,6 +164,11 @@ class SiteLoginController extends AbstractActionController
             return $this->redirect()->toRoute('admin'); // TODO Modify to redirect to site
         }
 
+        /** @var \Omeka\Api\Representation\SiteRepresentation $site */
+        $site = $this->currentSite(); // Omeka MVC handles cases where site does not exist or is not provided
+        $siteSlug = $site->slug();
+        $siteName = $site->title();
+
         $form = $this->getForm(\Omeka\Form\ForgotPasswordForm::class);
 
         if ($this->getRequest()->isPost()) {
@@ -183,7 +188,10 @@ class SiteLoginController extends AbstractActionController
                         $this->entityManager->remove($passwordCreation);
                         $this->entityManager->flush();
                     }
-                    $this->sitemailer()->sendSiteResetPassword($user); // TODO Modify link in email
+
+                    /** @var \RestrictedSites\Stdlib\SiteMailer $siteMailer */
+                    $siteMailer = $this->sitemailer();
+                    $siteMailer->sendSiteResetPassword($user, $siteSlug, $siteName);
                 }
                 $this->messenger()->addSuccess('Check your email for instructions on how to reset your password'); // @translate
                 return $this->redirect()->toRoute('site', array('site-slug' => $this->currentSite()->slug()));
