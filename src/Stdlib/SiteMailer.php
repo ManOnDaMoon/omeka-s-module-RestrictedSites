@@ -43,7 +43,6 @@ class SiteMailer extends \Omeka\Stdlib\Mailer
     public function sendSiteResetPassword(User $user, String $siteSlug, String $siteName)
     {
         $translate = $this->viewHelpers->get('translate');
-        $installationTitle = $siteName;
         $template = $translate('Greetings, %1$s!
 
 It seems you have forgotten your password for %5$s at %2$s
@@ -57,17 +56,17 @@ Your reset link will expire on %4$s.');
         $body = sprintf(
             $template,
             $user->getName(),
-            $this->getSubSiteUrl($siteSlug), // TODO Modifier avec le site courant
-            $this->getSiteCreatePasswordUrl($passwordCreation, $siteSlug), //TODO Modifier avec le site courant
+            $this->getSubSiteUrl($siteSlug),
+            $this->getSiteCreatePasswordUrl($passwordCreation, $siteSlug),
             $this->getExpiration($passwordCreation),
-            $installationTitle
+            $siteName
             );
 
         $message = $this->createMessage();
         $message->addTo($user->getEmail(), $user->getName())
         ->setSubject(sprintf(
             $translate('Reset your password for %s'),
-            $installationTitle
+            $siteName
             ))
             ->setBody($body);
             $this->send($message);

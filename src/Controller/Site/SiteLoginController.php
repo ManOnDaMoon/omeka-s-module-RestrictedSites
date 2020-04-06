@@ -2,8 +2,10 @@
 namespace RestrictedSites\Controller\Site;
 
 use RestrictedSites\Form\SiteLoginForm;
+use Omeka\Stdlib\DateTime;
 use Doctrine\ORM\EntityManager;
 use Omeka\Form\LoginForm;
+use Omeka\Form\ActivateForm;
 use Zend\Authentication\AuthenticationService;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Session\Container;
@@ -160,14 +162,16 @@ class SiteLoginController extends AbstractActionController
 
     public function forgotPasswordAction()
     {
-        if ($this->auth->hasIdentity()) {
-            return $this->redirect()->toRoute('admin'); // TODO Modify to redirect to site
-        }
-
         /** @var \Omeka\Api\Representation\SiteRepresentation $site */
         $site = $this->currentSite(); // Omeka MVC handles cases where site does not exist or is not provided
         $siteSlug = $site->slug();
         $siteName = $site->title();
+
+        if ($this->auth->hasIdentity()) {
+            return $this->redirect()->toRoute('site', array(
+                'site-slug' => $siteSlug
+            ));
+        }
 
         $form = $this->getForm(\Omeka\Form\ForgotPasswordForm::class);
 
@@ -194,8 +198,7 @@ class SiteLoginController extends AbstractActionController
                     $siteMailer->sendSiteResetPassword($user, $siteSlug, $siteName);
                 }
                 $this->messenger()->addSuccess('Check your email for instructions on how to reset your password'); // @translate
-                return $this->redirect()->toRoute('site', array('site-slug' => $this->currentSite()->slug()));
-                return $this->redirect()->toRoute('login'); // Modify to redirect to sitelogin
+                return $this->redirect()->toRoute('sitelogin', array('site-slug' => $this->currentSite()->slug()));
             } else {
                 $this->messenger()->addError('Activation unsuccessful'); // @translate
             }
@@ -208,8 +211,14 @@ class SiteLoginController extends AbstractActionController
 
     public function createPasswordAction()
     {
+        /** @var \Omeka\Api\Representation\SiteRepresentation $site */
+        $site = $this->currentSite(); // Omeka MVC handles cases where site does not exist or is not provided
+        $siteSlug = $site->slug();
+
         if ($this->auth->hasIdentity()) {
-            return $this->redirect()->toRoute('admin'); //TODO Modify to redirect to site
+            return $this->redirect()->toRoute('site', array(
+                'site-slug' => $siteSlug
+            ));
         }
 
         $passwordCreation = $this->entityManager->find(
@@ -228,7 +237,9 @@ class SiteLoginController extends AbstractActionController
             $this->entityManager->remove($passwordCreation);
             $this->entityManager->flush();
             $this->messenger()->addError('Password creation key expired.'); // @translate
-            return $this->redirect()->toRoute('login'); // TODO modify to redirect to site
+            return $this->redirect()->toRoute('sitelogin', array(
+                'site-slug' => $siteSlug
+            ));
         }
 
         $form = $this->getForm(ActivateForm::class);
@@ -244,7 +255,9 @@ class SiteLoginController extends AbstractActionController
                 $this->entityManager->remove($passwordCreation);
                 $this->entityManager->flush();
                 $this->messenger()->addSuccess('Successfully created your password. Please log in.'); // @translate
-                return $this->redirect()->toRoute('login'); // TODO Modify to redirect to site
+                return $this->redirect()->toRoute('sitelogin', array(
+                    'site-slug' => $siteSlug
+                ));
             } else {
                 $this->messenger()->addError('Password creation unsuccessful'); // @translate
             }
