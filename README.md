@@ -18,6 +18,7 @@ RestrictedSites is compatible with Omeka-S v2.
 ## Features
 
 This module includes the following features:
+
 * Restrict access of public sites to a list of registered users
 * Public-facing login form included in your public site theme, including a checkbox option to remember the user session
 * Site-specific password reset forms and e-mails: users are no longer redirected to the admin backend to create a new password 
@@ -36,12 +37,14 @@ Please note that this module does not change the behavior for Private sites, nor
 #### Configuration
 
 To enable this behavior on a site of your choice, the site must be set to public:
+
 * Navigate to your Omeka-S admin panel.
 * Click on the `Sites` menu.
 * Click the pencil icon next to the site you wish to configure.
 * Toggle as needed the eye-shaped visibility icon and save.
 
 You then need to enable the module for your site:
+
 * Navigate to your site `Settings` menu.
 * Check the `Restrict access to site user list` option and save.
 
@@ -51,6 +54,7 @@ Starting now, your site is closed to anonymous visitors but still facing public 
 You need to add authorized users to your site settings. Unless so, users trying to login on the site home will get a Forbidden error.
 
 In order to add users:
+
 * Navigate to your site `User permissions` menu
 * Add or remove the necessary users with at least `Viewer` permission
 * Save
