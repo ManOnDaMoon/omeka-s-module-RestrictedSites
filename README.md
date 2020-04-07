@@ -20,6 +20,7 @@ RestrictedSites is compatible with Omeka-S v2.
 This module includes the following features:
 * Restrict access of public sites to a list of registered users
 * Public-facing login form included in your public site theme, including a checkbox option to remember the user session
+* Site-specific password reset forms and e-mails: users are no longer redirected to the admin backend to create a new password 
 * Custom Log out link that does not redirect to admin backend
 * Ability to hide features (e.g. search form) from anonymous user
 * Built-in EN and FR localization
