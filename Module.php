@@ -7,6 +7,7 @@ use Zend\Mvc\MvcEvent;
 use Zend\EventManager\SharedEventManagerInterface;
 use Omeka\Permissions\Acl;
 use Zend\Session\Container;
+use Zend\View\Model\ViewModel;
 use Omeka\Settings\SiteSettings;
 
 class Module extends AbstractModule
@@ -28,6 +29,18 @@ class Module extends AbstractModule
                         'addRestrictedSiteSetting'
                 ));
 
+        // Attach to AddUser form to add the sites list
+        $sharedEventManager->attach('Omeka\Form\UserForm',
+                'form.add_elements',
+                array(
+                        $this,
+                        'addUserSiteList'
+                ));
+        
+        // Attach to EditUser form to add the sites list
+        $sharedEventManager->attach('Omeka\Controller\Admin\User', 'view.edit.form.after', array($this, 'editUserSiteList'));
+        $sharedEventManager->attach('Omeka\Controller\Admin\User', 'view.edit.section_nav', array($this, 'editUserSectionNav'));
+        
         // Attach to the router event to redirect to sitelogin
         $sharedEventManager->attach('*', MvcEvent::EVENT_ROUTE, [
             $this,
@@ -145,7 +158,7 @@ class Module extends AbstractModule
      */
     public function addRestrictedSiteSetting (EventInterface $event)
     {
-        /** @var \Omeka\Form\UserForm $form */
+        /** @var \Omeka\Form\SiteSettingsForm $form */
         $form = $event->getTarget();
 
         $siteSettings = $form->getSiteSettings();
@@ -175,5 +188,111 @@ class Module extends AbstractModule
                         )
                 ));
         return;
+    }
+    
+    /**
+     * Adds a list of sites on which to add the user as visitor (or other role)
+     *
+     * @param EventInterface $event
+     */
+    public function addUserSiteList (EventInterface $event)
+    {
+        $services = $this->getServiceLocator();
+        $api = $services->get('Omeka\ApiManager');
+        
+        $response = $api->search('sites');
+        $sites = $response->getContent();
+        
+        $siteList = [];
+        foreach ($sites as $site) {
+            $siteList[$site->id()] = $site->title();
+        }
+        
+        /** @var \Omeka\Form\SiteSettingsForm $form */
+        $form = $event->getTarget();
+        
+        $form->add([
+            'type' => 'fieldset',
+            'name' => 'restrictedsites-roles',
+            'options' => [
+                'label' => 'Site roles', // @translate
+            ],
+        ]);
+        
+        $rsFieldset = $form->get('restrictedsites-roles');
+
+        $rsFieldset->add(
+            array(
+                'name' => 'restrictedsites-role-visitor',
+                'type' => 'MultiCheckbox',
+                'options' => array(
+                    'label' => 'Add to site users (as visitor)', // @translate
+                ),
+            ));
+        
+        $rsMultiCB = $rsFieldset->get('restrictedsites-role-visitor');
+        
+        $rsMultiCB->setValueOptions($siteList);
+        
+        return;
+    }
+    
+    public function editUserSectionNav(EventInterface $event)
+    {
+        $sectionNav = $event->getPAram('section_nav');
+        $sectionNav['restrictedsites-sitelist'] = 'Site list'; // @translate
+        $event->setParam('section_nav', $sectionNav);
+    }
+    
+    public function editUserSiteList(EventInterface $event)
+    {
+        $services = $this->getServiceLocator();
+        $api = $services->get('Omeka\ApiManager');
+        
+        $response = $api->search('sites');
+        $sites = $response->getContent();
+        
+        $siteList = [];
+        foreach ($sites as $site) {
+            $siteList[$site->id()] = $site->title();
+        }
+        
+        /** @var \Zend\View\Renderer\PhpRenderer $viewRenderer */
+        $viewRenderer = $event->getTarget();
+        
+        /** @var \Omeka\Form\SiteSettingsForm $form */
+        $form = $viewRenderer->vars('form');
+        
+        $form->add([
+            'type' => 'fieldset',
+            'name' => 'restrictedsites-roles',
+            'options' => [
+                'label' => 'Site roles', // @translate
+            ],
+        ]);
+        
+        $rsFieldset = $form->get('restrictedsites-roles');
+        
+        $rsFieldset->add(
+            array(
+                'name' => 'restrictedsites-role-visitor',
+                'type' => 'MultiCheckbox',
+                'options' => array(
+                    'label' => 'Add to site users (as visitor)', // @translate
+                ),
+            ));
+        
+        $rsMultiCB = $rsFieldset->get('restrictedsites-role-visitor');
+        
+        $rsMultiCB->setValueOptions($siteList);
+        
+        //Add collection to form
+        
+        $view = new ViewModel;
+        $view->setTerminal(true);
+        $view->setTemplate('restricted-sites/admin/user/edit');
+        $view->setVariable('form', $form);
+
+        echo $viewRenderer->render($view);
     }
 }
