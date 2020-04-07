@@ -228,7 +228,9 @@ class SiteLoginController extends AbstractActionController
 
         if (!$passwordCreation) {
             $this->messenger()->addError('Invalid password creation key.'); // @translate
-            return $this->redirect()->toRoute('login');
+            return $this->redirect()->toRoute('sitelogin', array(
+                'site-slug' => $siteSlug
+            ));
         }
         $user = $passwordCreation->getUser();
 
