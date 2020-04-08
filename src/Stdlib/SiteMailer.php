@@ -74,6 +74,17 @@ Your reset link will expire on %4$s.');
     
     public function sendUserActivation(User $user)
     {
-        parent::sendUserActivation($user);
+        /** @var \Omeka\View\Helper\Setting $setting */
+        $setting = $this->viewHelpers->get('setting');
+        $defaultSiteId = $setting('default_site', 'Omeka S');
+        
+        /** @var \\Omeka\View\Helper\Setting $siteSetting */
+        $api = $this->viewHelpers->get('api');
+        $defaultSiteResponse = $api->read('sites', $defaultSiteId);
+        $defaultSite = $defaultSiteResponse->getContent();
+        $defaultSiteSlug = $defaultSite->slug();
+        $defaultSiteTitle = $defaultSite->title();
+        
+        $this->sendSiteResetPassword($user, $defaultSiteSlug, $defaultSiteTitle); //TODO : Make specific message for user activation
     }
 }
