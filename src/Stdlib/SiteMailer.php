@@ -71,10 +71,9 @@ Your reset link will expire on %4$s.');
             ->setBody($body);
             $this->send($message);
     }
-
-
-
-
-
-
+    
+    public function sendUserActivation(User $user)
+    {
+        parent::sendUserActivation($user);
+    }
 }

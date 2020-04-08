@@ -14,6 +14,7 @@ return [
         'service_manager' => [
             'factories' => [
                 'RestricedSites\SiteMailer' => RestrictedSites\Service\SiteMailerFactory::class,
+                'Omeka\Mailer' => RestrictedSites\Service\SiteMailerFactory::class,
             ]
         ],
         'controller_plugins' => [
