@@ -9,6 +9,8 @@ use Omeka\Permissions\Acl;
 use Zend\Session\Container;
 use Zend\View\Model\ViewModel;
 use Omeka\Settings\SiteSettings;
+use Omeka\Mvc\Controller\Plugin\GetForm;
+use Omeka\Form\Element\SiteSelect;
 
 class Module extends AbstractModule
 {
@@ -29,17 +31,20 @@ class Module extends AbstractModule
                         'addRestrictedSiteSetting'
                 ));
 
-        // Attach to AddUser form to add the sites list
-        $sharedEventManager->attach('Omeka\Form\UserForm',
-                'form.add_elements',
-                array(
-                        $this,
-                        'addUserSiteList'
-                ));
+//         // Attach to AddUser form to add the sites list
+//         $sharedEventManager->attach('Omeka\Form\UserForm',
+//                 'form.add_elements',
+//                 array(
+//                         $this,
+//                         'addUserSiteList'
+//                 ));
         
         // Attach to EditUser form to add the sites list
-        $sharedEventManager->attach('Omeka\Controller\Admin\User', 'view.edit.form.after', array($this, 'editUserSiteList'));
-        $sharedEventManager->attach('Omeka\Controller\Admin\User', 'view.edit.section_nav', array($this, 'editUserSectionNav'));
+        $sharedEventManager->attach('Omeka\Form\UserForm', 'form.add_elements', array($this, 'addUserFormSitePerm'));
+        
+        // Atach to user update events
+        $sharedEventManager->attach('Omeka\Entity\User', 'entity.persist.post', array($this, 'userEntityUpdateOrPersistPost'));
+        $sharedEventManager->attach('Omeka\Entity\User', 'entity.update.post', array($this, 'userEntityUpdateOrPersistPost'));
         
         // Attach to the router event to redirect to sitelogin
         $sharedEventManager->attach('*', MvcEvent::EVENT_ROUTE, [
@@ -190,109 +195,91 @@ class Module extends AbstractModule
         return;
     }
     
-    /**
-     * Adds a list of sites on which to add the user as visitor (or other role)
-     *
-     * @param EventInterface $event
-     */
-    public function addUserSiteList (EventInterface $event)
-    {
-        $services = $this->getServiceLocator();
-        $api = $services->get('Omeka\ApiManager');
-        
-        $response = $api->search('sites');
-        $sites = $response->getContent();
-        
-        $siteList = [];
-        foreach ($sites as $site) {
-            $siteList[$site->id()] = $site->title();
-        }
-        
-        /** @var \Omeka\Form\SiteSettingsForm $form */
-        $form = $event->getTarget();
-        
-        $form->add([
-            'type' => 'fieldset',
-            'name' => 'restrictedsites-roles',
-            'options' => [
-                'label' => 'Site roles', // @translate
-            ],
-        ]);
-        
-        $rsFieldset = $form->get('restrictedsites-roles');
-
-        $rsFieldset->add(
-            array(
-                'name' => 'restrictedsites-role-visitor',
-                'type' => 'MultiCheckbox',
-                'options' => array(
-                    'label' => 'Add to site users (as visitor)', // @translate
-                ),
-            ));
-        
-        $rsMultiCB = $rsFieldset->get('restrictedsites-role-visitor');
-        
-        $rsMultiCB->setValueOptions($siteList);
-        
-        return;
-    }
     
-    public function editUserSectionNav(EventInterface $event)
-    {
-        $sectionNav = $event->getPAram('section_nav');
-        $sectionNav['restrictedsites-sitelist'] = 'Site list'; // @translate
-        $event->setParam('section_nav', $sectionNav);
-    }
-    
-    public function editUserSiteList(EventInterface $event)
-    {
-        $services = $this->getServiceLocator();
-        $api = $services->get('Omeka\ApiManager');
-        
-        $response = $api->search('sites');
-        $sites = $response->getContent();
-        
-        $siteList = [];
-        foreach ($sites as $site) {
-            $siteList[$site->id()] = $site->title();
-        }
+    public function addUserFormSitePerm(EventInterface $event)
+    {       
         
         /** @var \Zend\View\Renderer\PhpRenderer $viewRenderer */
-        $viewRenderer = $event->getTarget();
+        $form = $event->getTarget();
         
-        /** @var \Omeka\Form\SiteSettingsForm $form */
-        $form = $viewRenderer->vars('form');
+//         /** @var \Omeka\Form\SiteSettingsForm $form */
+//         $form = $viewRenderer->vars('form');
+
         
-        $form->add([
-            'type' => 'fieldset',
-            'name' => 'restrictedsites-roles',
+        $rsFieldset = $form->get('user-information');
+        
+//         $rsFieldset->add([
+//             'name' => 'remove_from_site_permission',
+//             'type' => SiteSelect::class,
+//             'attributes' => [
+//                 'id' => 'remove-from-site-permission-select',
+//                 'class' => 'chosen-select',
+//                 'multiple' => true,
+//                 'data-placeholder' => 'Select sites…', // @translate
+//                 'data-collection-action' => 'remove',
+//             ],
+//             'options' => [
+//                 'label' => 'Remove from site permission', // @translate
+//                 'empty_option' => '[No change]', // @translate
+//                 'prepend_value_options' => ['-1' => '[All sites]'], // @translate
+//             ],
+//         ]);
+        
+        $rsFieldset->add([
+            'name' => 'add_to_site_permission',
+            'type' => SiteSelect::class,
+            'attributes' => [
+                'id' => 'add-to-site-permission-select',
+                'class' => 'chosen-select',
+                'multiple' => true,
+                'data-placeholder' => 'Select sites…', // @translate
+                'data-collection-action' => 'append',
+            ],
             'options' => [
-                'label' => 'Site roles', // @translate
+                'label' => 'Add to site permission', // @translate
+                'empty_option' => '[No change]', // @translate
+                'prepend_value_options' => ['-1' => '[All sites]'], // @translate
             ],
         ]);
         
-        $rsFieldset = $form->get('restrictedsites-roles');
+        $rsFieldset->add([
+            'name' => 'add_to_site_permission_role',
+            'type' => 'Select',
+            'attributes' => [
+                'id' => 'add-to-site-permission-role-select',
+                'data-placeholder' => 'Select permission…', // @translate
+                'data-collection-action' => 'append',
+            ],
+            'options' => [
+                'label' => 'Add to site permission as', // @translate
+                'empty_option' => '[No change]', // @translate
+                'value_options' => [
+                    'viewer' => 'Viewer', // @translate
+                    'editor' => 'Editor', // @translate
+                    'admin' => 'Admin', // @translate
+                ],
+            ],
+        ]);
         
-        $rsFieldset->add(
-            array(
-                'name' => 'restrictedsites-role-visitor',
-                'type' => 'MultiCheckbox',
-                'options' => array(
-                    'label' => 'Add to site users (as visitor)', // @translate
-                ),
-            ));
-        
-        $rsMultiCB = $rsFieldset->get('restrictedsites-role-visitor');
-        
-        $rsMultiCB->setValueOptions($siteList);
-        
-        //Add collection to form
-        
-        $view = new ViewModel;
-        $view->setTerminal(true);
-        $view->setTemplate('restricted-sites/admin/user/edit');
-        $view->setVariable('form', $form);
-
-        echo $viewRenderer->render($view);
+        $inputFilter = $form->getInputFilter();
+//         $inputFilter->add([
+//             'name' => 'remove_from_site_permission',
+//             'required' => false,
+//         ]);
+        $inputFilter->add([
+            'name' => 'add_to_site_permission',
+            'required' => false,
+        ]);
+        $inputFilter->add([
+            'name' => 'add_to_site_permission_role',
+            'required' => false,
+        ]);
     }
+    
+    public function userEntityUpdateOrPersistPost(EventInterface $event)
+    {
+        $userEntity = $event->getTarget();
+    }
+    
+
 }
