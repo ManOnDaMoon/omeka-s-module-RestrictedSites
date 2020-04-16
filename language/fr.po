@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: RestrictedSites\n"
+"Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-14 23:40+0100\n"
+"POT-Creation-Date: 2020-04-16 21:14+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ManOnDaMoon@GitHub\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -17,22 +17,75 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#: src/Stdlib/SiteMailer.php:93
+#, php-format
+msgid ""
+"Greetings!\n"
+"            \n"
+"A user has been created for you on %5$s at %1$s\n"
+"            \n"
+"Your username is your email: %2$s\n"
+"            \n"
+"Click this link to set a password and begin using %5$s:\n"
+"%3$s\n"
+"            \n"
+"Your activation link will expire on %4$s. If you have not completed the user "
+"activation process by the time the link expires, you will need to request "
+"another activation email from your site administrator."
+msgstr ""
+"Bienvenue !\n"
+"            \n"
+"Un utilisateur a été créé pour vous sur %5$s à l'adresse %1$s\n"
+"            \n"
+"Votre nom d'utilisateur est votre adresse e-mail : %2$s\n"
+"            \n"
+"Suivez ce lien pour choisir un mot de passe et commencer à utiliser %5$s :\n"
+"%3$s\n"
+"            \n"
+"Votre lien d'activation expirera le %4$s. Si vous n'avez pas terminé la "
+"procédure d'activation à cette date, le lien expirera et vous devrez alors "
+"demander un nouveau message d'activation auprès de l'administrateur du site."
+
+#: view/restricted-sites/site/site-login/logout.phtml:6
+msgid "Back to homepage"
+msgstr "Retour à la page d'accueil"
+
+#: Module.php:236
+msgid "Restricted Sites"
+msgstr "Sites Protégés"
+
+#: Module.php:247
+msgid "Restrict access to this site's user list"
+msgstr "Limiter l'accès uniquement à la liste des utilisateurs de ce site"
+
+#: Module.php:248
+msgid ""
+"Activates front-end login, logout and password reset UI for this site. Your "
+"site visibility must be set to Visible (in Site info pannel) for this "
+"feature to work properly."
+msgstr ""
+"Active une interface de connexion/déconnexion et de modification de mot de "
+"passe pour ce site. La visibilité de votre site doit être configurée sur "
+"Visible (dans le formulaire Informations du site) pour que cette "
+"fonctionnalité soit correctement activée."
+
 #: src/Form/SiteLoginForm.php:51
 msgid "Remember me"
-msgstr "Rester connecté"
+msgstr "Se souvenir de moi"
+
+#: src/Form/ConfigForm.php:17
+msgid "Use custom user validation email"
+msgstr "Utiliser un e-mail de validation spécifique"
+
+#: src/Form/ConfigForm.php:18
+msgid ""
+"Upon user creation, activation email will refer and contain a link to the "
+"default site instead of the admin dashboard."
+msgstr ""
+"Lors de la création d'un utilisateur, l'e-mail d'activation fera référence "
+"et contiendra un lien vers le site par défaut à la place de l'interface "
+"d'administration."
 
 #: src/Site/Navigation/Link/Logout.php:18
 msgid "Logout link"
 msgstr "Lien de déconnexion"
-
-#: Module.php:157
-msgid "Restrict access to site user list"
-msgstr "Restreindre l'accès au site et limiter aux utilisateurs configurés"
-
-#: view/restricted-sites/site/site-login/logout.phtml:6
-msgid "Back to homepage"
-msgstr "Retourner à la page d'accueil"
-
-#: Module.php:159
-msgid "Restricted Sites"
-msgstr "Sites restreints"
