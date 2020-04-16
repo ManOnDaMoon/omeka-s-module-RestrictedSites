@@ -34,16 +34,16 @@ The RestrictedSites module merely provides a shortcut action to login directly o
 
 Please note that this module does not change the behavior for Private sites, nor the one of the Omeka-S API.
 
-#### Configuration
+#### How to enable the feature on a site
 
-To enable this behavior on a site of your choice, the site must be set to public:
+To enable this behavior on a site of your choice, its visibility option must be set to Public:
 
 * Navigate to your Omeka-S admin panel.
 * Click on the `Sites` menu.
 * Click the pencil icon next to the site you wish to configure.
-* Toggle as needed the eye-shaped visibility icon and save.
+* Toggle as needed the eye-shaped visibility icon as needed and save.
 
-You then need to enable the module for your site:
+You then need to enable the  restriction feature for your site:
 
 * Navigate to your site `Settings` menu.
 * Check the `Restrict access to site user list` option and save.
@@ -58,6 +58,8 @@ In order to add users:
 * Navigate to your site `User permissions` menu
 * Add or remove the necessary users with at least `Viewer` permission
 * Save
+
+Omeka-S also provides a way to add multiple users to multiple sites using Batch Edit features (broken as of v2.1.1).
 
 ### Login form
 The module includes a default login form. If you want to customize this form to suit your theme, you should be able to edit or include the following template in your theme package:
@@ -75,11 +77,13 @@ To do so, in any view template, surround the elements you want to hide to non-re
 ```
 
 ### Custom log out link
-A custom log out link is available in your site `Navigation` configuration. This link terminates the user's session and redirects to the site login form, but does not display the admin backend login form.
+A custom log out link is available to add to your site `Navigation` configuration. This link terminates the user's session and redirects to the site login form, but does not display the admin backend login form.
 
 ## Module configuration
 
-There is no module-specific configuration.
+To configure global options for this module, navigate to the Modules panel and click the `Configure` button facing the RestrictedSites module.
+
+* Use custom user validation email: If this option is enabled, activation emails sent upon user creation will refer and contain a link to the default site instead of the admin dashboard.
 
 ## Known issues
 
@@ -93,6 +97,7 @@ Contributions are welcome. The module is in early development stage and could do
 
 Some code and logic based on other Omeka-S modules:
 - GuestUser: https://github.com/biblibre/omeka-s-module-GuestUser
+- MetaDataBrowse: https://github.com/omeka-s-modules/MetadataBrowse
 - Omeka-S main repository: https://github.com/omeka/omeka-s
 
 

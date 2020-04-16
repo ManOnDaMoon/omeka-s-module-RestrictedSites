@@ -3,7 +3,6 @@ namespace RestrictedSites\Stdlib;
 
 use Omeka\Entity\User;
 use Omeka\Entity\PasswordCreation;
-use Zend\Mail\Message;
 
 class SiteMailer extends \Omeka\Stdlib\Mailer
 {
@@ -76,6 +75,11 @@ Your reset link will expire on %4$s.');
     {
         /** @var \Omeka\View\Helper\Setting $setting */
         $setting = $this->viewHelpers->get('setting');
+        
+        if (!$setting('restrictedsites_custom_email', false)) {
+            return parent::sendUserActivation($user);
+        }
+        
         $defaultSiteId = $setting('default_site', 'Omeka S');
         
         /** @var \\Omeka\View\Helper\Setting $siteSetting */
@@ -85,6 +89,35 @@ Your reset link will expire on %4$s.');
         $defaultSiteSlug = $defaultSite->slug();
         $defaultSiteTitle = $defaultSite->title();
         
-        $this->sendSiteResetPassword($user, $defaultSiteSlug, $defaultSiteTitle); //TODO : Make specific message for user activation
+        $translate = $this->viewHelpers->get('translate');
+        $template = $translate('Greetings!
+            
+A user has been created for you on %5$s at %1$s
+            
+Your username is your email: %2$s
+            
+Click this link to set a password and begin using %5$s:
+%3$s
+            
+Your activation link will expire on %4$s. If you have not completed the user activation process by the time the link expires, you will need to request another activation email from your site administrator.');
+        
+        $passwordCreation = $this->getPasswordCreation($user, true);
+        $body = sprintf(
+            $template,
+            $this->getSubSiteUrl($defaultSiteSlug),
+            $user->getEmail(),
+            $this->getSiteCreatePasswordUrl($passwordCreation, $defaultSiteSlug),
+            $this->getExpiration($passwordCreation),
+            $defaultSiteTitle
+            );
+        
+        $message = $this->createMessage();
+        $message->addTo($user->getEmail(), $user->getName())
+        ->setSubject(sprintf(
+            $translate('User activation for %s'),
+            $defaultSiteTitle
+            ))
+            ->setBody($body);
+            $this->send($message);
     }
 }

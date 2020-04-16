@@ -2,6 +2,7 @@
 namespace RestrictedSites\Service;
 
 use RestrictedSites\Stdlib\SiteMailer;
+use Omeka\Service\Exception\ConfigException;
 use Zend\Mail\Transport\Factory as TransportFactory;
 use Zend\ServiceManager\Factory\FactoryInterface;
 use Interop\Container\ContainerInterface;
@@ -19,7 +20,7 @@ class SiteMailerFactory implements FactoryInterface
         $viewHelpers = $serviceLocator->get('ViewHelperManager');
         $entityManager = $serviceLocator->get('Omeka\EntityManager');
         if (!isset($config['mail']['transport'])) {
-            throw new Exception\ConfigException('Missing mail transport configuration');
+            throw new ConfigException ('Missing mail transport configuration');
         }
         $transport = TransportFactory::create($config['mail']['transport']);
         $defaultOptions = [];

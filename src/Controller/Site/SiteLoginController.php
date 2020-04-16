@@ -77,7 +77,7 @@ class SiteLoginController extends AbstractActionController
         }
 
         // Anonymous user, display and handle login form
-        /** @var Omeka\Form\LoginForm $form */
+        /** @var \Omeka\Form\LoginForm $form */
         $form = $this->getForm(SiteLoginForm::class);
         if ($this->getRequest()->isPost()) {
             $data = $this->getRequest()->getPost();

@@ -11,14 +11,20 @@ return [
                         'RestrictedSites\Stdlib\SiteMailer' => RestrictedSites\Service\SiteMailerFactory::class,
                 ]
         ],
+        'form_elements' => [
+            'factories' => [
+                'RestrictedSites\Form\ConfigForm' => 'RestrictedSites\Service\Form\ConfigFormFactory',
+            ],
+        ],
         'service_manager' => [
             'factories' => [
                 'RestricedSites\SiteMailer' => RestrictedSites\Service\SiteMailerFactory::class,
-                'Omeka\Mailer' => RestrictedSites\Service\SiteMailerFactory::class,
+                'Omeka\Mailer' => RestrictedSites\Service\SiteMailerFactory::class, //required to customize user creation mail
             ]
         ],
         'controller_plugins' => [
             'factories' => [
+                // Specific plugin in case I manage to NOT override core Mailer service:
                 'sitemailer' => RestrictedSites\Service\ControllerPlugin\SiteMailerFactory::class,
             ],
         ],

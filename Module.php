@@ -1,13 +1,17 @@
 <?php
 namespace RestrictedSites;
+use Composer\Semver\Comparator;
 use Omeka\Module\AbstractModule;
 use Zend\EventManager\EventInterface;
-use Omeka\Form\UserForm;
 use Zend\Mvc\MvcEvent;
+use Zend\Mvc\Controller\AbstractController;
 use Zend\EventManager\SharedEventManagerInterface;
 use Omeka\Permissions\Acl;
+use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\Session\Container;
-use Omeka\Settings\SiteSettings;
+use RestrictedSites\Form\ConfigForm;
+use Zend\View\Renderer\PhpRenderer;
+use Zend\Http\PhpEnvironment\Response;
 
 class Module extends AbstractModule
 {
@@ -44,11 +48,11 @@ class Module extends AbstractModule
      * user is not logged in.
      *
      * @param MvcEvent $event
-     * @return Zend\Http\PhpEnvironment\Response
+     * @return Response
      */
     public function redirectToSiteLogin (MvcEvent $event)
     {
-        // Filter on __SITE__ route identifier, and excluding sitelogin route to
+        // Filter on __SITE__ route identifier, and excluding this module's other routes to
         // avoid redirection loops
         $routeMatch = $event->getRouteMatch();
         $route = $routeMatch->getMatchedRouteName();
@@ -67,8 +71,8 @@ class Module extends AbstractModule
 
             /** @var \Omeka\Settings\SiteSettings $siteSettings */
             $siteSettings = $serviceLocator->get('Omeka\Settings\Site');
-
-            $restricted = $siteSettings->get('restricted', null, $site->id());
+            $siteSettings->setTargetId($site->id());
+            $restricted = $siteSettings->get('restrictedsites_restricted', null);
             if (! $restricted) {
                 return; // Site is not restricted - exiting
             }
@@ -122,6 +126,77 @@ class Module extends AbstractModule
     }
 
     /**
+     * Upgrade this module.
+     *
+     * @param string $oldVersion
+     * @param string $newVersion
+     * @param ServiceLocatorInterface $serviceLocator
+     */
+    public function upgrade($oldVersion, $newVersion, ServiceLocatorInterface $serviceLocator)
+    {
+        $api = $serviceLocator->get('Omeka\ApiManager');
+        $sites = $api->search('sites', [])->getContent();
+        /** @var \Omeka\Settings\SiteSettings $siteSettings */
+        $siteSettings = $serviceLocator->get('Omeka\Settings\Site');
+        
+        // v0.10 renamed site setting ID from 'restricted' to 'restrictedsites_restricted'
+        if (Comparator::lessThan($oldVersion, '0.10')) {
+            foreach ($sites as $site) {
+                $siteSettings->setTargetId($site->id());
+                if ($oldSetting = $siteSettings->get('restricted', null)) {
+                    $siteSettings->set('restrictedsites_restricted', $oldSetting);
+                    $siteSettings->delete('restricted');
+                }
+            }
+        }
+    }
+
+    public function uninstall(ServiceLocatorInterface $serviceLocator)
+    {
+        $settings = $serviceLocator->get('Omeka\Settings');
+        $settings->delete('restrictedsites_custom_email');
+        
+        $api = $serviceLocator->get('Omeka\ApiManager');
+        $sites = $api->search('sites', [])->getContent();
+        $siteSettings = $serviceLocator->get('Omeka\Settings\Site');
+        
+        foreach ($sites as $site) {
+            $siteSettings->setTargetId($site->id());
+            $siteSettings->delete('restrictedsites_restricted');
+        }
+    }
+
+    /**
+     * Get this module's configuration form.
+     *
+     * @param PhpRenderer $renderer
+     * @return string
+     */
+    public function getConfigForm(PhpRenderer $renderer)
+    {
+        $formElementManager = $this->getServiceLocator()->get('FormElementManager');
+        $form = $formElementManager->get(ConfigForm::class, []);
+        return $renderer->formCollection($form, false);
+    }
+    
+    /**
+     * Handle this module's configuration form.
+     *
+     * @param AbstractController $controller
+     * @return bool False if there was an error during handling
+     */
+    public function handleConfigForm(AbstractController $controller)
+    {
+        $params = $controller->params()->fromPost();
+        if (isset($params['restrictedsites_custom_email'])) {
+            $customEmailSetting = $params['restrictedsites_custom_email'];
+        }
+        
+        $globalSettings = $this->getServiceLocator()->get('Omeka\Settings');
+        $globalSettings->set('restrictedsites_custom_email', $customEmailSetting);
+    }
+    
+    /**
      * Called on module application bootstrap, this adds the required ACL level
      * authorization for anybody to use the sitelogin controller
      *
@@ -162,20 +237,19 @@ class Module extends AbstractModule
             ],
         ]);
 
-        // TODO : Check for site visibility setting and warn if set to private
-
         $rsFieldset = $form->get('restrictedsites');
 
         $rsFieldset->add(
                 array(
-                        'name' => 'restricted',
+                        'name' => 'restrictedsites_restricted',
                         'type' => 'Checkbox',
                         'options' => array(
-                                'label' => 'Restrict access to site user list' // @translate
+                                'label' => 'Restrict access to this site\'s user list', // @translate
+                                'info' => 'Activates front-end login, logout and password reset UI for this site. Your site visibility must be set to Visible (in Site info pannel) for this feature to work properly.', // @translate
                         ),
                         'attributes' => array(
                                 'value' => (bool) $siteSettings->get(
-                                        'restricted', false)
+                                        'restrictedsites_restricted', false)
                         )
                 ));
         return;
