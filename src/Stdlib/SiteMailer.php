@@ -3,10 +3,31 @@ namespace RestrictedSites\Stdlib;
 
 use Omeka\Entity\User;
 use Omeka\Entity\PasswordCreation;
+use Omeka\Api\Manager;
 
 class SiteMailer extends \Omeka\Stdlib\Mailer
 {
+    const NEW_USER_TEMPLATE = 'Greetings!
 
+A user has been created for you on %5$s at %1$s
+
+Your username is your email: %2$s
+
+Click this link to set a password and begin using %5$s:
+%3$s
+
+Your activation link will expire on %4$s. If you have not completed the user activation process by the time the link expires, you will need to request another activation email from your site administrator.'; // @translate
+
+    const NEW_USERNAME_TEMPLATE = 'Greetings!
+
+A user has been created for you on %5$s at %1$s
+
+Your username is: %6$s or your email: %2$s
+
+Click this link to set a password and begin using %5$s:
+%3$s
+
+Your activation link will expire on %4$s. If you have not completed the user activation process by the time the link expires, you will need to request another activation email from your site administrator.'; // @translate
     /**
      * Return an absolute URL to a specific sub-site public page.
      *
@@ -31,7 +52,7 @@ class SiteMailer extends \Omeka\Stdlib\Mailer
             'sitelogin/create-password',
             ['site-slug' => $siteSlug, 'key' => $passwordCreation->getId()],
             ['force_canonical' => true]
-            );
+        );
     }
 
     /**
@@ -59,48 +80,51 @@ Your reset link will expire on %4$s.');
             $this->getSiteCreatePasswordUrl($passwordCreation, $siteSlug),
             $this->getExpiration($passwordCreation),
             $siteName
-            );
+        );
 
         $message = $this->createMessage();
         $message->addTo($user->getEmail(), $user->getName())
         ->setSubject(sprintf(
             $translate('Reset your password for %s'),
             $siteName
-            ))
+        ))
             ->setBody($body);
-            $this->send($message);
+        $this->send($message);
     }
-    
+
     public function sendUserActivation(User $user)
     {
         /** @var \Omeka\View\Helper\Setting $setting */
         $setting = $this->viewHelpers->get('setting');
-        
+
         if (!$setting('restrictedsites_custom_email', false)) {
             return parent::sendUserActivation($user);
         }
-        
+
         $defaultSiteId = $setting('default_site', 'Omeka S');
-        
-        /** @var \\Omeka\View\Helper\Setting $siteSetting */
+
+        /** @var Manager $api */
         $api = $this->viewHelpers->get('api');
         $defaultSiteResponse = $api->read('sites', $defaultSiteId);
         $defaultSite = $defaultSiteResponse->getContent();
         $defaultSiteSlug = $defaultSite->slug();
         $defaultSiteTitle = $defaultSite->title();
-        
+
+
+        try {
+            // Throws error if UserName module not active.
+            if ($userNameResponse = $api->read('usernames', $user->getId())) {
+                $userName = $userNameResponse->getContent()->userName();
+            }
+        } catch (\Exception $e) {
+            $userName = false;
+        }
+
         $translate = $this->viewHelpers->get('translate');
-        $template = $translate('Greetings!
-            
-A user has been created for you on %5$s at %1$s
-            
-Your username is your email: %2$s
-            
-Click this link to set a password and begin using %5$s:
-%3$s
-            
-Your activation link will expire on %4$s. If you have not completed the user activation process by the time the link expires, you will need to request another activation email from your site administrator.');
-        
+
+        $template = $userName ? self::NEW_USERNAME_TEMPLATE : self::NEW_USER_TEMPLATE;
+        $template = $translate($template);
+
         $passwordCreation = $this->getPasswordCreation($user, true);
         $body = sprintf(
             $template,
@@ -108,16 +132,17 @@ Your activation link will expire on %4$s. If you have not completed the user act
             $user->getEmail(),
             $this->getSiteCreatePasswordUrl($passwordCreation, $defaultSiteSlug),
             $this->getExpiration($passwordCreation),
-            $defaultSiteTitle
-            );
-        
+            $defaultSiteTitle,
+            $userName
+        );
+
         $message = $this->createMessage();
         $message->addTo($user->getEmail(), $user->getName())
         ->setSubject(sprintf(
             $translate('User activation for %s'),
             $defaultSiteTitle
-            ))
+        ))
             ->setBody($body);
-            $this->send($message);
+        $this->send($message);
     }
 }
