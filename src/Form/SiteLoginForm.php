@@ -2,6 +2,8 @@
 namespace RestrictedSites\Form;
 use Zend\Form\Form;
 use Omeka\Form\LoginForm;
+use Zend\EventManager\Event;
+use Zend\EventManager\EventManagerAwareTrait;
 
 /**
  * Extend the existing Omeka\Form\LoginForm class and adds a "Remember Me"
@@ -16,9 +18,13 @@ use Omeka\Form\LoginForm;
 class SiteLoginForm extends LoginForm
 {
 
+    use EventManagerAwareTrait;
+
+
     public function init ()
     {
         $this->setAttribute('class', 'disable-unsaved-warning');
+
         $this->add(
                 [
                         'name' => 'email',
@@ -64,6 +70,9 @@ class SiteLoginForm extends LoginForm
                 ])
 
         ;
+
+        $addEvent = new Event('form.add_elements', $this);
+        $this->getEventManager()->triggerEvent($addEvent);
 
         $inputFilter = $this->getInputFilter();
         $inputFilter->add(

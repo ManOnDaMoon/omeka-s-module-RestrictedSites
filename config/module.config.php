@@ -14,6 +14,7 @@ return [
         'form_elements' => [
             'factories' => [
                 'RestrictedSites\Form\ConfigForm' => 'RestrictedSites\Service\Form\ConfigFormFactory',
+                'RestrictedSites\Form\SiteLoginForm' => 'RestrictedSites\Service\Form\SiteLoginFormFactory',
             ],
         ],
         'service_manager' => [
