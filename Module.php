@@ -1,5 +1,6 @@
 <?php
 namespace RestrictedSites;
+
 use Composer\Semver\Comparator;
 use Omeka\Module\AbstractModule;
 use Zend\EventManager\EventInterface;
@@ -15,7 +16,6 @@ use Zend\Http\PhpEnvironment\Response;
 
 class Module extends AbstractModule
 {
-
     protected $excludedRoutes = array('sitelogin',
         'sitelogout',
         'sitelogin/forgot-password',
@@ -25,16 +25,19 @@ class Module extends AbstractModule
     /**
      * Attach to Zend and Omeka specific listeners
      */
-    public function attachListeners (
-            SharedEventManagerInterface $sharedEventManager)
+    public function attachListeners(
+        SharedEventManagerInterface $sharedEventManager
+    )
     {
         // Attach to site settings form to add the module settings
-        $sharedEventManager->attach('Omeka\Form\SiteSettingsForm',
-                'form.add_elements',
-                array(
+        $sharedEventManager->attach(
+            'Omeka\Form\SiteSettingsForm',
+            'form.add_elements',
+            array(
                         $this,
                         'addRestrictedSiteSetting'
-                ));
+                )
+        );
 
         // Attach to the router event to redirect to sitelogin
         $sharedEventManager->attach('*', MvcEvent::EVENT_ROUTE, [
@@ -50,24 +53,25 @@ class Module extends AbstractModule
      * @param MvcEvent $event
      * @return Response
      */
-    public function redirectToSiteLogin (MvcEvent $event)
+    public function redirectToSiteLogin(MvcEvent $event)
     {
         // Filter on __SITE__ route identifier, and excluding this module's other routes to
         // avoid redirection loops
         $routeMatch = $event->getRouteMatch();
         $route = $routeMatch->getMatchedRouteName();
         if ($routeMatch->getParam('__SITE__') && !in_array($route, $this->excludedRoutes)) {
-
             $serviceLocator = $event->getApplication()->getServiceManager();
             $api = $serviceLocator->get('Omeka\ApiManager');
 
             // Fetching site information
             // Omeka MVC handles cases where site does not exist or is not provided
             $siteSlug = $routeMatch->getParam('site-slug');
-            $site = $api->read('sites',
-                    [
+            $site = $api->read(
+                'sites',
+                [
                             'slug' => $siteSlug
-                    ])->getContent();
+                    ]
+            )->getContent();
 
             /** @var \Omeka\Settings\SiteSettings $siteSettings */
             $siteSettings = $serviceLocator->get('Omeka\Settings\Site');
@@ -86,24 +90,28 @@ class Module extends AbstractModule
                     /** @var \Omeka\Api\Representation\UserRepresentation $registeredUser */
                     $registeredUser = $sitePermission->user();
                     $registeredUserId = $registeredUser->id();
-                    if ($registeredUserId == $userId)
-                        return; // User is registered as site authorized user -
+                    if ($registeredUserId == $userId) {
+                        return;
+                    } // User is registered as site authorized user -
                                     // exiting
                 }
             }
 
             // Anonymous visitor : redirecting to sitelogin/login
             $url = $event->getRouter()->assemble(
-                    [
+                [
                             'site-slug' => $siteSlug
                     ],
-                    [
+                [
                             'name' => 'sitelogin'
-                    ]);
+                    ]
+            );
             $session = Container::getDefaultManager()->getStorage();
-            $session->offsetSet('redirect_url',
-                    $event->getRequest()
-                        ->getUriString());
+            $session->offsetSet(
+                'redirect_url',
+                $event->getRequest()
+                        ->getUriString()
+            );
             $response = $event->getResponse();
             $response->getHeaders()->addHeaderLine('Location', $url);
             $response->setStatusCode(302); // redirect
@@ -120,7 +128,7 @@ class Module extends AbstractModule
      *
      * @see \Omeka\Module\AbstractModule::getConfig()
      */
-    public function getConfig ()
+    public function getConfig()
     {
         return include __DIR__ . '/config/module.config.php';
     }
@@ -204,16 +212,19 @@ class Module extends AbstractModule
      *
      * @see \Omeka\Module\AbstractModule::onBootstrap()
      */
-    public function onBootstrap (MvcEvent $event)
+    public function onBootstrap(MvcEvent $event)
     {
         parent::onBootstrap($event);
 
         /** @var Acl $acl */
         $acl = $this->getServiceLocator()->get('Omeka\Acl');
-        $acl->allow(null,
-                [
+        $acl->allow(
+            null,
+            [
                         'RestrictedSites\Controller\Site\SiteLogin'
-                ], null);
+                ],
+            null
+        );
     }
 
     /**
@@ -222,7 +233,7 @@ class Module extends AbstractModule
      *
      * @param EventInterface $event
      */
-    public function addRestrictedSiteSetting (EventInterface $event)
+    public function addRestrictedSiteSetting(EventInterface $event)
     {
         /** @var \Omeka\Form\UserForm $form */
         $form = $event->getTarget();
@@ -240,7 +251,7 @@ class Module extends AbstractModule
         $rsFieldset = $form->get('restrictedsites');
 
         $rsFieldset->add(
-                array(
+            array(
                         'name' => 'restrictedsites_restricted',
                         'type' => 'Checkbox',
                         'options' => array(
@@ -249,9 +260,12 @@ class Module extends AbstractModule
                         ),
                         'attributes' => array(
                                 'value' => (bool) $siteSettings->get(
-                                        'restrictedsites_restricted', false)
+                                    'restrictedsites_restricted',
+                                    false
+                                )
                         )
-                ));
+                )
+        );
         return;
     }
 }

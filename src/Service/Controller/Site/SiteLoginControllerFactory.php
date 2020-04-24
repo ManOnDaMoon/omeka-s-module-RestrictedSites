@@ -1,5 +1,6 @@
 <?php
 namespace RestrictedSites\Service\Controller\Site;
+
 use RestrictedSites\Controller\Site\SiteLoginController;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;

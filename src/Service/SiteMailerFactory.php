@@ -20,7 +20,7 @@ class SiteMailerFactory implements FactoryInterface
         $viewHelpers = $serviceLocator->get('ViewHelperManager');
         $entityManager = $serviceLocator->get('Omeka\EntityManager');
         if (!isset($config['mail']['transport'])) {
-            throw new ConfigException ('Missing mail transport configuration');
+            throw new ConfigException('Missing mail transport configuration');
         }
         $transport = TransportFactory::create($config['mail']['transport']);
         $defaultOptions = [];

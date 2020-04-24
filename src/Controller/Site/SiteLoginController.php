@@ -58,18 +58,18 @@ class SiteLoginController extends AbstractActionController
         $siteSlug = $site->slug();
 
         if ($this->auth->hasIdentity()) {
-
             $userId = $this->auth->getIdentity()->getId();
             $sitePermissions = $site->sitePermissions();
             foreach ($sitePermissions as $sitePermission) {
                 /** @var \Omeka\Api\Representation\UserRepresentation $registeredUser */
                 $registeredUser = $sitePermission->user();
                 $registeredUserId = $registeredUser->id();
-                if ($registeredUserId == $userId)
+                if ($registeredUserId == $userId) {
                     // Authorized user, redirecting to site.
                     return $this->redirect()->toRoute('site', array(
                         'site-slug' => $siteSlug
                     ));
+                }
             }
             // Non authorized user, sending Forbidden error code
             $this->response->setStatusCode(403);
@@ -132,7 +132,6 @@ class SiteLoginController extends AbstractActionController
     public function logoutAction()
     {
         if ($this->auth->hasIdentity()) {
-
             $this->auth->clearIdentity();
             /** @var \Zend\Session\SessionManager $sessionManager */
             $sessionManager = Container::getDefaultManager();
@@ -144,7 +143,6 @@ class SiteLoginController extends AbstractActionController
 
             // At this point, user is logged out. Prepare login page.
             $this->messenger()->addSuccess('Successfully logged out'); // @translate
-
         } else {
             // Visitor not logged in, redirect to home page
             $this->redirect()->toRoute('site', array('site-slug' => $this->currentSite()->slug()));
@@ -224,7 +222,7 @@ class SiteLoginController extends AbstractActionController
         $passwordCreation = $this->entityManager->find(
             'Omeka\Entity\PasswordCreation',
             $this->params('key')
-            );
+        );
 
         if (!$passwordCreation) {
             $this->messenger()->addError('Invalid password creation key.'); // @translate

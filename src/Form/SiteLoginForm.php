@@ -1,5 +1,6 @@
 <?php
 namespace RestrictedSites\Form;
+
 use Zend\Form\Form;
 use Omeka\Form\LoginForm;
 use Zend\EventManager\Event;
@@ -17,16 +18,15 @@ use Zend\EventManager\EventManagerAwareTrait;
  */
 class SiteLoginForm extends LoginForm
 {
-
     use EventManagerAwareTrait;
 
 
-    public function init ()
+    public function init()
     {
         $this->setAttribute('class', 'disable-unsaved-warning');
 
         $this->add(
-                [
+            [
                         'name' => 'email',
                         'type' => 'Email',
                         'options' => [
@@ -35,9 +35,10 @@ class SiteLoginForm extends LoginForm
                         'attributes' => [
                                 'required' => true
                         ]
-                ]);
+                ]
+        );
         $this->add(
-                [
+            [
                         'name' => 'password',
                         'type' => 'Password',
                         'options' => [
@@ -46,11 +47,12 @@ class SiteLoginForm extends LoginForm
                         'attributes' => [
                                 'required' => true
                         ]
-                ]);
+                ]
+        );
 
         // New "Remember me" checkbox element
         $this->add(
-                array(
+            array(
                         'name' => 'rememberme',
                         'type' => 'Checkbox',
                         'options' => array(
@@ -58,16 +60,18 @@ class SiteLoginForm extends LoginForm
                         )
 ,
                         'attributes' => array()
-                ));
+                )
+        );
 
         $this->add(
-                [
+            [
                         'name' => 'submit',
                         'type' => 'Submit',
                         'attributes' => [
                                 'value' => 'Log in' // @translate
                         ]
-                ])
+                ]
+        )
 
         ;
 
@@ -76,14 +80,16 @@ class SiteLoginForm extends LoginForm
 
         $inputFilter = $this->getInputFilter();
         $inputFilter->add(
-                [
+            [
                         'name' => 'email',
                         'required' => true
-                ]);
+                ]
+        );
         $inputFilter->add(
-                [
+            [
                         'name' => 'password',
                         'required' => true
-                ]);
+                ]
+        );
     }
 }
