@@ -96,20 +96,13 @@ Your reset link will expire on %4$s.');
     {
         /** @var \Omeka\View\Helper\Setting $setting */
         $setting = $this->viewHelpers->get('setting');
-
-        if (!$setting('restrictedsites_custom_email', false) ||
-            !($defaultSiteId = $setting('default_site', 'Omeka S'))) {
-            // Option disabled or no default site configured
-            return parent::sendUserActivation($user);
-        }
-
         /** @var \\Omeka\View\Helper\Setting $siteSetting */
         $api = $this->viewHelpers->get('api');
-        $defaultSiteResponse = $api->read('sites', $defaultSiteId);
-        $defaultSite = $defaultSiteResponse->getContent();
-        $defaultSiteSlug = $defaultSite->slug();
-        $defaultSiteTitle = $defaultSite->title();
 
+        if (!$setting('restrictedsites_custom_email', false)) {
+            // Email customization disabled
+            return parent::sendUserActivation($user);
+        }
 
         try {
             // Throws error if UserName module not active.
@@ -124,23 +117,42 @@ Your reset link will expire on %4$s.');
 
         $template = $userName ? self::NEW_USERNAME_TEMPLATE : self::NEW_USER_TEMPLATE;
         $template = $translate($template);
-
         $passwordCreation = $this->getPasswordCreation($user, true);
-        $body = sprintf(
-            $template,
-            $this->getSubSiteUrl($defaultSiteSlug),
-            $user->getEmail(),
-            $this->getSiteCreatePasswordUrl($passwordCreation, $defaultSiteSlug),
-            $this->getExpiration($passwordCreation),
-            $defaultSiteTitle,
-            $userName
-        );
+
+        if (($defaultSiteId = $setting('default_site', 'Omeka S'))) {
+            $defaultSiteResponse = $api->read('sites', $defaultSiteId);
+            $defaultSite = $defaultSiteResponse->getContent();
+            $defaultSiteSlug = $defaultSite->slug();
+            $siteTitle = $defaultSite->title();
+
+            $body = sprintf(
+                $template,
+                $this->getSubSiteUrl($defaultSiteSlug),
+                $user->getEmail(),
+                $this->getSiteCreatePasswordUrl($passwordCreation, $defaultSiteSlug),
+                $this->getExpiration($passwordCreation),
+                $siteTitle,
+                $userName
+                );
+        } else {
+            // Default site not configured. Falling back to standard fields
+            $siteTitle = $this->getInstallationTitle();
+            $body = sprintf(
+                $template,
+                $this->getSiteUrl(),
+                $user->getEmail(),
+                $this->getCreatePasswordUrl($passwordCreation),
+                $this->getExpiration($passwordCreation),
+                $this->getInstallationTitle(),
+                $userName
+                );
+        }
 
         $message = $this->createMessage();
         $message->addTo($user->getEmail(), $user->getName())
         ->setSubject(sprintf(
-            $translate('User activation for %s'),
-            $defaultSiteTitle
+            $translate('User activation for %s'), // @translate
+            $siteTitle
         ))
             ->setBody($body);
         $this->send($message);
