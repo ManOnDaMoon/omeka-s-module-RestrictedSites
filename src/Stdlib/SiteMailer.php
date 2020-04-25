@@ -97,13 +97,13 @@ Your reset link will expire on %4$s.');
         /** @var \Omeka\View\Helper\Setting $setting */
         $setting = $this->viewHelpers->get('setting');
 
-        if (!$setting('restrictedsites_custom_email', false)) {
+        if (!$setting('restrictedsites_custom_email', false) ||
+            !($defaultSiteId = $setting('default_site', 'Omeka S'))) {
+            // Option disabled or no default site configured
             return parent::sendUserActivation($user);
         }
 
-        $defaultSiteId = $setting('default_site', 'Omeka S');
-
-        /** @var Manager $api */
+        /** @var \\Omeka\View\Helper\Setting $siteSetting */
         $api = $this->viewHelpers->get('api');
         $defaultSiteResponse = $api->read('sites', $defaultSiteId);
         $defaultSite = $defaultSiteResponse->getContent();
