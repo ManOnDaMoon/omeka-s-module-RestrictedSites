@@ -4,7 +4,6 @@ namespace RestrictedSites\Controller\Site;
 use RestrictedSites\Form\SiteLoginForm;
 use Omeka\Stdlib\DateTime;
 use Doctrine\ORM\EntityManager;
-use Omeka\Form\LoginForm;
 use Omeka\Form\ActivateForm;
 use Zend\Authentication\AuthenticationService;
 use Zend\Mvc\Controller\AbstractActionController;
@@ -34,15 +33,22 @@ class SiteLoginController extends AbstractActionController
     protected $entityManager;
 
     /**
+     *
+     * @var boolean
+     */
+    protected $useUserNames = false;
+
+    /**
      * Data required by the factory to instantiate controller
      *
      * @param EntityManager $entityManager
      * @param AuthenticationService $auth
      */
-    public function __construct(EntityManager $entityManager, AuthenticationService $auth)
+    public function __construct(EntityManager $entityManager, AuthenticationService $auth, bool $useUserNames = false)
     {
         $this->entityManager = $entityManager;
         $this->auth = $auth;
+        $this->useUserNames = $useUserNames;
     }
 
     /**
@@ -107,7 +113,11 @@ class SiteLoginController extends AbstractActionController
                         'site-slug' => $siteSlug
                     ));
                 } else {
-                    $this->messenger()->addError('Email or password is invalid'); // @translate
+                    if ($this->useUserNames) {
+                        $this->messenger()->addError('User name, email, or password is invalid'); // @translate
+                    } else {
+                        $this->messenger()->addError('Email or password is invalid'); // @translate
+                    }
                 }
             } else {
                 $this->messenger()->addFormErrors($form);

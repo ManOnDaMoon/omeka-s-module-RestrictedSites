@@ -3,10 +3,15 @@ namespace RestrictedSites\Stdlib;
 
 use Omeka\Entity\User;
 use Omeka\Entity\PasswordCreation;
+use Zend\Mail\Transport\TransportInterface;
+use Doctrine\ORM\EntityManager;
+use Zend\View\HelperPluginManager;
 use Omeka\Api\Manager;
 
 class SiteMailer extends \Omeka\Stdlib\Mailer
 {
+    protected $useUserNames = false;
+
     const NEW_USER_TEMPLATE = 'Greetings!
 
 A user has been created for you on %5$s at %1$s
@@ -28,6 +33,27 @@ Click this link to set a password and begin using %5$s:
 %3$s
 
 Your activation link will expire on %4$s. If you have not completed the user activation process by the time the link expires, you will need to request another activation email from your site administrator.'; // @translate
+
+    /**
+     * Set the transport and message defaults.
+     *
+     * @var TransportInterface $transport
+     * @var array $defaultOptions
+     */
+    public function __construct(
+        TransportInterface $transport,
+        HelperPluginManager $viewHelpers,
+        EntityManager $entityManager,
+        bool $useUserNames,
+        array $defaultOptions = []
+    ) {
+        $this->transport = $transport;
+        $this->viewHelpers = $viewHelpers;
+        $this->entityManager = $entityManager;
+        $this->defaultOptions = $defaultOptions;
+        $this->useUserNames = $useUserNames;
+    }
+
     /**
      * Return an absolute URL to a specific sub-site public page.
      *
@@ -96,7 +122,7 @@ Your reset link will expire on %4$s.');
     {
         /** @var \Omeka\View\Helper\Setting $setting */
         $setting = $this->viewHelpers->get('setting');
-        /** @var \\Omeka\View\Helper\Setting $siteSetting */
+        /** @var Manager $api */
         $api = $this->viewHelpers->get('api');
 
         if (!$setting('restrictedsites_custom_email', false)) {
@@ -104,12 +130,10 @@ Your reset link will expire on %4$s.');
             return parent::sendUserActivation($user);
         }
 
-        try {
-            // Throws error if UserName module not active.
-            if ($userNameResponse = $api->read('usernames', $user->getId())) {
-                $userName = $userNameResponse->getContent()->userName();
-            }
-        } catch (\Exception $e) {
+        // Throws error if UserName module not active.
+        if ($this->useUserNames && $userNameResponse = $api->read('usernames', $user->getId())) {
+            $userName = $userNameResponse->getContent()->userName();
+        } else {
             $userName = false;
         }
 
@@ -133,7 +157,7 @@ Your reset link will expire on %4$s.');
                 $this->getExpiration($passwordCreation),
                 $siteTitle,
                 $userName
-                );
+            );
         } else {
             // Default site not configured. Falling back to standard fields
             $siteTitle = $this->getInstallationTitle();
@@ -145,7 +169,7 @@ Your reset link will expire on %4$s.');
                 $this->getExpiration($passwordCreation),
                 $this->getInstallationTitle(),
                 $userName
-                );
+            );
         }
 
         $message = $this->createMessage();

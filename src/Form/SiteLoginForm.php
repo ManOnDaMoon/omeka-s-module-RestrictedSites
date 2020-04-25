@@ -1,7 +1,6 @@
 <?php
 namespace RestrictedSites\Form;
 
-use Zend\Form\Form;
 use Omeka\Form\LoginForm;
 use Zend\EventManager\Event;
 use Zend\EventManager\EventManagerAwareTrait;

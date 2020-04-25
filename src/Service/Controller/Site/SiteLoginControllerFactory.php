@@ -20,7 +20,9 @@ class SiteLoginControllerFactory implements FactoryInterface
     {
         return new SiteLoginController(
             $services->get('Omeka\EntityManager'),
-            $services->get('Omeka\AuthenticationService')
+            $services->get('Omeka\AuthenticationService'),
+            ($services->get('Omeka\ModuleManager')->getModule('UserNames')
+                && $services->get('Omeka\ModuleManager')->getModule('UserNames')->getState() == 'active')
         );
     }
 }

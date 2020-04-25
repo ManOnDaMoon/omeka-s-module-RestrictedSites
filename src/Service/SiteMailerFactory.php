@@ -31,6 +31,11 @@ class SiteMailerFactory implements FactoryInterface
             $settings = $serviceLocator->get('Omeka\Settings');
             $defaultOptions['from'] = $settings->get('administrator_email');
         }
-        return new SiteMailer($transport, $viewHelpers, $entityManager, $defaultOptions);
+        /** @var \Omeka\Module\Manager $modMgr */
+        $modMgr = $serviceLocator->get('Omeka\ModuleManager');
+        $useUserNames = ($modMgr->getModule('UserNames')
+            && $modMgr->getModule('UserNames')->getState() == 'active');
+
+        return new SiteMailer($transport, $viewHelpers, $entityManager, $useUserNames, $defaultOptions);
     }
 }
