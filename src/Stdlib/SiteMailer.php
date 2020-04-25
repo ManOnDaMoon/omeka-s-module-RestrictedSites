@@ -70,37 +70,37 @@ Your reset link will expire on %4$s.');
             ->setBody($body);
             $this->send($message);
     }
-    
+
     public function sendUserActivation(User $user)
     {
         /** @var \Omeka\View\Helper\Setting $setting */
         $setting = $this->viewHelpers->get('setting');
-        
-        if (!$setting('restrictedsites_custom_email', false)) {
+
+        if (!$setting('restrictedsites_custom_email', false) ||
+            !($defaultSiteId = $setting('default_site', 'Omeka S'))) {
+            // Option disabled or no default site configured
             return parent::sendUserActivation($user);
         }
-        
-        $defaultSiteId = $setting('default_site', 'Omeka S');
-        
+
         /** @var \\Omeka\View\Helper\Setting $siteSetting */
         $api = $this->viewHelpers->get('api');
         $defaultSiteResponse = $api->read('sites', $defaultSiteId);
         $defaultSite = $defaultSiteResponse->getContent();
         $defaultSiteSlug = $defaultSite->slug();
         $defaultSiteTitle = $defaultSite->title();
-        
+
         $translate = $this->viewHelpers->get('translate');
         $template = $translate('Greetings!
-            
+
 A user has been created for you on %5$s at %1$s
-            
+
 Your username is your email: %2$s
-            
+
 Click this link to set a password and begin using %5$s:
 %3$s
-            
+
 Your activation link will expire on %4$s. If you have not completed the user activation process by the time the link expires, you will need to request another activation email from your site administrator.');
-        
+
         $passwordCreation = $this->getPasswordCreation($user, true);
         $body = sprintf(
             $template,
@@ -110,7 +110,7 @@ Your activation link will expire on %4$s. If you have not completed the user act
             $this->getExpiration($passwordCreation),
             $defaultSiteTitle
             );
-        
+
         $message = $this->createMessage();
         $message->addTo($user->getEmail(), $user->getName())
         ->setSubject(sprintf(
