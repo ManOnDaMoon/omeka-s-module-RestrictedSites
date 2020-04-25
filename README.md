@@ -24,15 +24,16 @@ This module includes the following features:
 * Site-specific password reset forms and e-mails: users are no longer redirected to the admin backend to create a new password 
 * Custom Log out link that does not redirect to admin backend
 * Ability to hide features (e.g. search form) from anonymous user
+* Full compatibility with module UserNames to allow the use of username identifiers on your sites: https://github.com/ManOnDaMoon/omeka-s-module-UserNames
 * Built-in EN and FR localization
 
 ### Restrict access of public sites
 
-The RestrictedSites module changes the way users access public sites of your choice. On a standard Omeka-S configuration, all public sites are open to visitors. Private sites, on the contrary, are hidden to the public eye and users must login to the administration backend before navigating a private site homepage.
+The RestrictedSites module changes the way users access the public sites of your choice. On a standard Omeka-S configuration, all public sites are open to visitors. Private sites, on the contrary, are hidden to the public eye and users must login first on the administration backend before navigating a private site homepage.
 
-The RestrictedSites module merely provides a shortcut action to login directly on a site.
+The RestrictedSites module provides a shortcut to login directly on a site. Additionnally, it handles all of user authentication tasks from within the site: password creation, password request, logout. Finally, activation and password resets email can point to the default site of your installation.
 
-Please note that this module does not change the behavior for Private sites, nor the one of the Omeka-S API.
+Please note that this module does not change the behavior for Private sites, nor the one of the Omeka-S API (public content on restricted sites will still be visible using the API).
 
 #### How to enable the feature on a site
 
@@ -51,7 +52,7 @@ You then need to enable the  restriction feature for your site:
 Starting now, your site is closed to anonymous visitors but still facing public visibility, unlike private sites.
 
 #### Adding users
-You need to add authorized users to your site settings. Unless so, users trying to login on the site home will get a Forbidden error.
+<a name="abcd">You</a> need to add authorized users to your site settings. Unless so, users trying to login on the site home will get a Forbidden error.
 
 In order to add users:
 
@@ -83,7 +84,7 @@ A custom log out link is available to add to your site `Navigation` configuratio
 
 To configure global options for this module, navigate to the Modules panel and click the `Configure` button facing the RestrictedSites module.
 
-* Use custom user validation email: If this option is enabled, activation emails sent upon user creation will refer and contain a link to the default site instead of the admin dashboard.
+* Use custom user validation email: If this option is enabled, activation emails sent upon user creation will refer and contain a link to the default site instead of the admin dashboard. These links will work even if the default site is not itself restricted.
 
 ## Known issues
 
@@ -96,10 +97,12 @@ Contributions are welcome. The module is in early development stage and could do
 ## Links
 
 Some code and logic based on other Omeka-S modules:
-- GuestUser: https://github.com/biblibre/omeka-s-module-GuestUser
-- MetaDataBrowse: https://github.com/omeka-s-modules/MetadataBrowse
-- Omeka-S main repository: https://github.com/omeka/omeka-s
 
+* GuestUser: https://github.com/biblibre/omeka-s-module-GuestUser
+* MetaDataBrowse: https://github.com/omeka-s-modules/MetadataBrowse
+* Omeka-S main repository: https://github.com/omeka/omeka-s
+
+Check out the UserNames module for more info : https://github.com/ManOnDaMoon/omeka-s-module-UserNames
 
 ## Licensing
 
