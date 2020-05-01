@@ -131,8 +131,8 @@ Your reset link will expire on %4$s.');
         }
 
         // Throws error if UserName module not active.
-        if ($this->useUserNames && $userNameResponse = $api->read('usernames', $user->getId())) {
-            $userName = $userNameResponse->getContent()->userName();
+        if ($this->useUserNames && !empty($userNameResponse = $api->search('usernames', ['user' => $user->getId()], ['limit' => 1]))) {
+            $userName = $userNameResponse->getContent()[0]->userName();
         } else {
             $userName = false;
         }

@@ -80,6 +80,8 @@ class SiteLoginController extends AbstractActionController
             // Non authorized user, sending Forbidden error code
             $this->response->setStatusCode(403);
             $this->messenger()->addError('Forbidden'); // @translate
+            // FIXME In this case, the login prompt is showed although user is authenticated
+            // Should redirect to proper 403 page instead of adding error to messenger
         }
 
         // Anonymous user, display and handle login form
