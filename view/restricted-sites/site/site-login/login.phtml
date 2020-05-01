@@ -3,8 +3,12 @@ $this->htmlElement('body')->appendAttribute('class', 'login');
 ?>
 <div class="site-login">
 <?php echo $this->messages(); ?>
-<h1><?php echo $this->translate('Log in'); ?></h1>
-<?php echo $this->form($form); ?>
-<p class="forgot-password"><?php echo $this->hyperlink($this->translate('Forgot password?'), $this->url( 'sitelogin/forgot-password', ['controller' => 'sitelogin', 'action' => 'forgot-password', 'site-slug' => $site->slug()])); ?></p>
+<?php if (isset($user) && !$user): ?>
+    <h1><?php echo $this->translate('Log in'); ?></h1>
+    <?php echo $this->form($form); ?>
+    <p class="forgot-password"><?php echo $this->hyperlink($this->translate('Forgot password?'), $this->url( 'sitelogin/forgot-password', ['controller' => 'sitelogin', 'action' => 'forgot-password', 'site-slug' => $site->slug()])); ?></p>
+<?php else: ?>
+	<p class="forgot-password"><?php echo $this->hyperlink($this->translate('Back to homepage'), $this->url('top', [], ['force_canonical' => true])); ?></p>
+<?php endif;?>
 </div>
 <?php $this->trigger('view.login.after'); ?>

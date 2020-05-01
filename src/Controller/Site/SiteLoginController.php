@@ -79,9 +79,9 @@ class SiteLoginController extends AbstractActionController
             }
             // Non authorized user, sending Forbidden error code
             $this->response->setStatusCode(403);
-            $this->messenger()->addError('Forbidden'); // @translate
+            $this->messenger()->addError('You do not have permission to view this site'); // @translate
             // FIXME In this case, the login prompt is showed although user is authenticated
-            // Should redirect to proper 403 page instead of adding error to messenger
+            // Should redirect to proper 403 page instead of adding error to messenger?
         }
 
         // Anonymous user, display and handle login form
@@ -130,6 +130,7 @@ class SiteLoginController extends AbstractActionController
         $view = new ViewModel();
         $view->setVariable('form', $form);
         $view->setVariable('site', $site);
+        $view->setVariable('user', $this->auth->hasIdentity() ? $this->auth->getIdentity() : false);
 
         /** @var MvcEvent $event */
         $event = $this->event;
@@ -163,6 +164,7 @@ class SiteLoginController extends AbstractActionController
         /** @var \Zend\View\Model\ViewModel $view */
         $view = new ViewModel();
         $view->setVariable('site', $this->currentSite());
+        $view->setTemplate('restricted-sites/site/site-login/login');
         // This variable is used to hide specific content to unregistered users
         // (e.g. Search or Navigation menus in top level view models):
         $view->setVariable('isLogin', true);

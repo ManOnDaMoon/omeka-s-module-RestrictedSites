@@ -1,8 +1,0 @@
-<?php
-$this->htmlElement('body')->appendAttribute('class', 'login');
-?>
-<div class="site-login">
-<?php echo $this->messages(); ?>
-<p class="forgot-password"><?php echo $this->hyperlink($this->translate('Back to homepage'), $this->url('sitelogin', array('site-slug' => $site->slug()))); ?></p>
-</div>
-<?php $this->trigger('view.login.after'); ?>
