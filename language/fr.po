@@ -118,3 +118,7 @@ msgstr ""
 "Votre lien d'activation expirera le %4$s. Si vous n'avez pas terminé la "
 "procédure d'activation à cette date, le lien expirera et vous devrez alors "
 "demander un nouveau message d'activation auprès de l'administrateur du site."
+
+#: src/Controller/Site/SiteLoginController.php:82
+msgid "You do not have permission to view this site"
+msgstr "Vous n'avez pas la permission de visiter ce site"
