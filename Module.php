@@ -13,6 +13,8 @@ use Zend\Session\Container;
 use RestrictedSites\Form\ConfigForm;
 use Zend\View\Renderer\PhpRenderer;
 use Zend\Http\PhpEnvironment\Response;
+use Omeka\Api\Representation\SiteRepresentation;
+use Omeka\Mvc\Status;
 
 class Module extends AbstractModule
 {
@@ -57,21 +59,17 @@ class Module extends AbstractModule
     {
         // Filter on __SITE__ route identifier, and excluding this module's other routes to
         // avoid redirection loops
-        $routeMatch = $event->getRouteMatch();
-        $route = $routeMatch->getMatchedRouteName();
-        if ($routeMatch->getParam('__SITE__') && !in_array($route, $this->excludedRoutes)) {
+
+        /* @var Status $status */
+        $status = $this->serviceLocator->get('Omeka\Status');
+        if ($status->isSiteRequest() && ! in_array($status->getRouteMatch()->getMatchedRouteName(), $this->excludedRoutes)) {
             $serviceLocator = $event->getApplication()->getServiceManager();
-            $api = $serviceLocator->get('Omeka\ApiManager');
 
             // Fetching site information
-            // Omeka MVC handles cases where site does not exist or is not provided
-            $siteSlug = $routeMatch->getParam('site-slug');
-            $site = $api->read(
-                'sites',
-                [
-                            'slug' => $siteSlug
-                    ]
-            )->getContent();
+            $curSitePlugin = $this->serviceLocator->get('ControllerPluginManager')->get('currentSite');
+            /* @var SiteRepresentation $site */
+            $site = $curSitePlugin();
+            $siteSlug = $site->slug();
 
             /** @var \Omeka\Settings\SiteSettings $siteSettings */
             $siteSettings = $serviceLocator->get('Omeka\Settings\Site');
@@ -146,7 +144,7 @@ class Module extends AbstractModule
         $sites = $api->search('sites', [])->getContent();
         /** @var \Omeka\Settings\SiteSettings $siteSettings */
         $siteSettings = $serviceLocator->get('Omeka\Settings\Site');
-        
+
         // v0.10 renamed site setting ID from 'restricted' to 'restrictedsites_restricted'
         if (Comparator::lessThan($oldVersion, '0.10')) {
             foreach ($sites as $site) {
@@ -163,11 +161,11 @@ class Module extends AbstractModule
     {
         $settings = $serviceLocator->get('Omeka\Settings');
         $settings->delete('restrictedsites_custom_email');
-        
+
         $api = $serviceLocator->get('Omeka\ApiManager');
         $sites = $api->search('sites', [])->getContent();
         $siteSettings = $serviceLocator->get('Omeka\Settings\Site');
-        
+
         foreach ($sites as $site) {
             $siteSettings->setTargetId($site->id());
             $siteSettings->delete('restrictedsites_restricted');
@@ -186,7 +184,7 @@ class Module extends AbstractModule
         $form = $formElementManager->get(ConfigForm::class, []);
         return $renderer->formCollection($form, false);
     }
-    
+
     /**
      * Handle this module's configuration form.
      *
@@ -199,11 +197,11 @@ class Module extends AbstractModule
         if (isset($params['restrictedsites_custom_email'])) {
             $customEmailSetting = $params['restrictedsites_custom_email'];
         }
-        
+
         $globalSettings = $this->getServiceLocator()->get('Omeka\Settings');
         $globalSettings->set('restrictedsites_custom_email', $customEmailSetting);
     }
-    
+
     /**
      * Called on module application bootstrap, this adds the required ACL level
      * authorization for anybody to use the sitelogin controller
