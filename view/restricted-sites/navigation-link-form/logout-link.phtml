@@ -4,3 +4,9 @@ $label = isset($data['label']) && '' !== trim($data['label']) ? $data['label'] :
 ?>
 <label><?php echo $this->translate('Type'); ?> <input type="text" value="<?php echo $escape($this->translate($link->getName())); ?>" disabled></label>
 <label><?php echo $this->translate('Label'); ?> <input type="text" data-name="label" value="<?php echo $escape($label); ?>"></label>
+<?php
+// RoleBasedNavigation compatibility:
+if ($this->resolver('role-based-navigation/common/role-select')) {
+    echo $this->partial('role-based-navigation/common/role-select', ['data' => $data]);
+}
+?>

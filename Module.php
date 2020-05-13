@@ -29,8 +29,7 @@ class Module extends AbstractModule
      */
     public function attachListeners(
         SharedEventManagerInterface $sharedEventManager
-    )
-    {
+    ) {
         // Attach to site settings form to add the module settings
         $sharedEventManager->attach(
             'Omeka\Form\SiteSettingsForm',
