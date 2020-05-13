@@ -80,6 +80,8 @@ To do so, in any view template, surround the elements you want to hide to non-re
 ### Custom log out link
 A custom log out link is available to add to your site `Navigation` configuration. This link terminates the user's session and redirects to the site login form, but does not display the admin backend login form.
 
+This navigation link is compatible with the RoleBasedNavigation module: if installed, you can select which roles are able to see the Logout link. Typically select all global roles to hide it only from unregistered users. 
+
 ## Module configuration
 
 To configure global options for this module, navigate to the Modules panel and click the `Configure` button facing the RestrictedSites module.
