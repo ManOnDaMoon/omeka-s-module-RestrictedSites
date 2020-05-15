@@ -25,6 +25,7 @@ This module includes the following features:
 * Custom Log out link that does not redirect to admin backend
 * Ability to hide features (e.g. search form) from anonymous user
 * Full compatibility with module UserNames to allow the use of username identifiers on your sites: https://github.com/ManOnDaMoon/omeka-s-module-UserNames
+* Compatibility with module RoleBasedNavigation to allow custom display rules for the log out link in a site navigation menu: https://github.com/ManOnDaMoon/omeka-s-module-RoleBasedNavigation
 * Built-in EN and FR localization
 
 ### Restrict access of public sites
@@ -94,7 +95,7 @@ See the Issues page.
 
 ## Contributing
 
-Contributions are welcome. The module is in early development stage and could do with more advanced usage and testing.
+Contributions are welcome. Please use Issues and Pull Requests workflows to contribute.
 
 ## Links
 
@@ -104,7 +105,9 @@ Some code and logic based on other Omeka-S modules:
 * MetaDataBrowse: https://github.com/omeka-s-modules/MetadataBrowse
 * Omeka-S main repository: https://github.com/omeka/omeka-s
 
-Check out the UserNames module for more info : https://github.com/ManOnDaMoon/omeka-s-module-UserNames
+Check out the UserNames module for more info: https://github.com/ManOnDaMoon/omeka-s-module-UserNames
+
+Check out the RoleBasedNavigation module for more info: https://github.com/ManOnDaMoon/omeka-s-module-RoleBasedNavigation
 
 ## Licensing
 
