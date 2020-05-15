@@ -4,6 +4,7 @@ namespace RestrictedSites\Site\Navigation\Link;
 use Omeka\Site\Navigation\Link\LinkInterface;
 use Omeka\Stdlib\ErrorStore;
 use Omeka\Api\Representation\SiteRepresentation;
+use RoleBasedNavigation\Module;
 
 class Logout implements LinkInterface
 {
@@ -26,6 +27,29 @@ class Logout implements LinkInterface
     public function getFormTemplate()
     {
         return 'restricted-sites/navigation-link-form/logout-link';
+    }
+
+    protected function _filterRoleSelectors(array $roleSelectors)
+    {
+        if (!class_exists(Module)) {
+            return $roleSelectors;
+        }
+
+        if (in_array(Module::RBN_AUTHENTICATED_USERS, $roleSelectors)) {
+            if (in_array(Module::RBN_UNAUTHENTICATED_VISITORS, $roleSelectors)) {
+                return []; // equivalent to empty selection
+            } else {
+                return [
+                    Module::RBN_AUTHENTICATED_USERS
+                ];
+            }
+        } elseif (in_array(Module::RBN_UNAUTHENTICATED_VISITORS, $roleSelectors)) {
+            return [
+                Module::RBN_UNAUTHENTICATED_VISITORS
+            ];
+        } else {
+            return $roleSelectors;
+        }
     }
 
     /**
