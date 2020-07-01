@@ -5,11 +5,11 @@ use RestrictedSites\Form\SiteLoginForm;
 use Omeka\Stdlib\DateTime;
 use Doctrine\ORM\EntityManager;
 use Omeka\Form\ActivateForm;
-use Zend\Authentication\AuthenticationService;
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\Session\Container;
-use Zend\View\Model\ViewModel;
-use Zend\Mvc\MvcEvent;
+use Laminas\Authentication\AuthenticationService;
+use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\Session\Container;
+use Laminas\View\Model\ViewModel;
+use Laminas\Mvc\MvcEvent;
 
 /**
  * Provides controller sitelogin and action login for managing acess to sites
@@ -55,7 +55,7 @@ class SiteLoginController extends AbstractActionController
      * Unique login action to display Login form and handle login procedure.
      * Returns with "Forbidden" code 403 for non-authorized users.
      *
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function loginAction()
     {
@@ -100,7 +100,7 @@ class SiteLoginController extends AbstractActionController
                 $result = $this->auth->authenticate();
                 if ($result->isValid()) {
 
-                    /** @var \Zend\Session\Storage\SessionStorage $session */
+                    /** @var \Laminas\Session\Storage\SessionStorage $session */
                     $session = $sessionManager->getStorage();
 
                     // Maximize session ttl to 30 days if "Remember me" is
@@ -126,7 +126,7 @@ class SiteLoginController extends AbstractActionController
             }
         }
 
-        /** @var \Zend\View\Model\ViewModel $view */
+        /** @var \Laminas\View\Model\ViewModel $view */
         $view = new ViewModel();
         $view->setVariable('form', $form);
         $view->setVariable('site', $site);
@@ -146,7 +146,7 @@ class SiteLoginController extends AbstractActionController
     {
         if ($this->auth->hasIdentity()) {
             $this->auth->clearIdentity();
-            /** @var \Zend\Session\SessionManager $sessionManager */
+            /** @var \Laminas\Session\SessionManager $sessionManager */
             $sessionManager = Container::getDefaultManager();
 
             $eventManager = $this->getEventManager();
@@ -161,7 +161,7 @@ class SiteLoginController extends AbstractActionController
             $this->redirect()->toRoute('site', array('site-slug' => $this->currentSite()->slug()));
         }
 
-        /** @var \Zend\View\Model\ViewModel $view */
+        /** @var \Laminas\View\Model\ViewModel $view */
         $view = new ViewModel();
         $view->setVariable('site', $this->currentSite());
         $view->setTemplate('restricted-sites/site/site-login/login');

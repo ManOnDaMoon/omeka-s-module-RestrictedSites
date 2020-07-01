@@ -2,7 +2,7 @@
 namespace RestrictedSites\Mvc\Controller\Plugin;
 
 use RestrictedSites\Stdlib\SiteMailer as MailerService;
-use Zend\Mvc\Controller\Plugin\AbstractPlugin;
+use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 
 /**
  * Controller plugin for getting the mailer service.

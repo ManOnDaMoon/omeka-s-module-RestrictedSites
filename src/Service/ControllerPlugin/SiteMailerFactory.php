@@ -3,7 +3,7 @@ namespace RestrictedSites\Service\ControllerPlugin;
 
 use Interop\Container\ContainerInterface;
 use RestrictedSites\Mvc\Controller\Plugin\SiteMailer;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class SiteMailerFactory implements FactoryInterface
 {

@@ -3,9 +3,9 @@ namespace RestrictedSites\Stdlib;
 
 use Omeka\Entity\User;
 use Omeka\Entity\PasswordCreation;
-use Zend\Mail\Transport\TransportInterface;
+use Laminas\Mail\Transport\TransportInterface;
 use Doctrine\ORM\EntityManager;
-use Zend\View\HelperPluginManager;
+use Laminas\View\HelperPluginManager;
 use Omeka\Api\Manager;
 
 class SiteMailer extends \Omeka\Stdlib\Mailer

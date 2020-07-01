@@ -1,7 +1,7 @@
 <?php
 namespace RestrictedSites\Service\Form;
 
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 use Interop\Container\ContainerInterface;
 use RestrictedSites\Form\SiteLoginForm;
 

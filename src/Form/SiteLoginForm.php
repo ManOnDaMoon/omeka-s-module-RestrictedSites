@@ -2,8 +2,8 @@
 namespace RestrictedSites\Form;
 
 use Omeka\Form\LoginForm;
-use Zend\EventManager\Event;
-use Zend\EventManager\EventManagerAwareTrait;
+use Laminas\EventManager\Event;
+use Laminas\EventManager\EventManagerAwareTrait;
 
 /**
  * Extend the existing Omeka\Form\LoginForm class and adds a "Remember Me"
