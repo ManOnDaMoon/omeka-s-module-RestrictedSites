@@ -2,12 +2,12 @@
 
 namespace RestrictedSites\Form;
 
-use Zend\Form\Form;
+use Laminas\Form\Form;
 
 class ConfigForm extends Form
 {
     protected $globalSettings;
-    
+
     public function init()
     {
         $this->add([
@@ -22,10 +22,10 @@ class ConfigForm extends Form
                 'id' => 'restrictedsites_custom_email',
             ],
         ]);
-        
+
         //TODO : Add site selection instead of only handling default site
     }
-    
+
     public function setGlobalSettings($globalSettings)
     {
         $this->globalSettings = $globalSettings;

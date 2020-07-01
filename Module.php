@@ -3,16 +3,16 @@ namespace RestrictedSites;
 
 use Composer\Semver\Comparator;
 use Omeka\Module\AbstractModule;
-use Zend\EventManager\EventInterface;
-use Zend\Mvc\MvcEvent;
-use Zend\Mvc\Controller\AbstractController;
-use Zend\EventManager\SharedEventManagerInterface;
+use Laminas\EventManager\EventInterface;
+use Laminas\Mvc\MvcEvent;
+use Laminas\Mvc\Controller\AbstractController;
+use Laminas\EventManager\SharedEventManagerInterface;
 use Omeka\Permissions\Acl;
-use Zend\ServiceManager\ServiceLocatorInterface;
-use Zend\Session\Container;
+use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\Session\Container;
 use RestrictedSites\Form\ConfigForm;
-use Zend\View\Renderer\PhpRenderer;
-use Zend\Http\PhpEnvironment\Response;
+use Laminas\View\Renderer\PhpRenderer;
+use Laminas\Http\PhpEnvironment\Response;
 use Omeka\Api\Representation\SiteRepresentation;
 use Omeka\Mvc\Status;
 
@@ -25,7 +25,7 @@ class Module extends AbstractModule
     );
 
     /**
-     * Attach to Zend and Omeka specific listeners
+     * Attach to Laminas and Omeka specific listeners
      */
     public function attachListeners(
         SharedEventManagerInterface $sharedEventManager

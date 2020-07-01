@@ -3,7 +3,7 @@ namespace RestrictedSites\Service\Controller\Site;
 
 use RestrictedSites\Controller\Site\SiteLoginController;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class SiteLoginControllerFactory implements FactoryInterface
 {
@@ -14,7 +14,7 @@ class SiteLoginControllerFactory implements FactoryInterface
      *
      * {@inheritDoc}
      *
-     * @see \Zend\ServiceManager\Factory\FactoryInterface::__invoke()
+     * @see \Laminas\ServiceManager\Factory\FactoryInterface::__invoke()
      */
     public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
     {

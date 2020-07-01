@@ -47,7 +47,7 @@ return [
         'router' => [
                 'routes' => [
                         'sitelogin' => [
-                                'type' => \Zend\Router\Http\Segment::class,
+                                'type' => \Laminas\Router\Http\Segment::class,
                                 'options' => [
                                         'route' => '/sitelogin/:site-slug',
                                         'constraints' => [
@@ -63,7 +63,7 @@ return [
                                 'may_terminate' => true,
                                 'child_routes' => [
                                     'forgot-password' => [
-                                        'type' => \Zend\Router\Http\Segment::class,
+                                        'type' => \Laminas\Router\Http\Segment::class,
                                         'options' => [
                                             'route' => '/forgot-password',
                                             'defaults' => [
@@ -76,7 +76,7 @@ return [
                                         ],
                                     ],
                                     'create-password' => [
-                                        'type' => \Zend\Router\Http\Segment::class,
+                                        'type' => \Laminas\Router\Http\Segment::class,
                                         'options' => [
                                             'route' => '/create-password/:key',
                                             'constraints' => [

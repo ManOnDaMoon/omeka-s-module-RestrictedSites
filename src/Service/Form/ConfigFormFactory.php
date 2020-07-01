@@ -3,7 +3,7 @@
 namespace RestrictedSites\Service\Form;
 
 use RestrictedSites\Form\ConfigForm;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 use Interop\Container\ContainerInterface;
 
 class ConfigFormFactory implements FactoryInterface
@@ -13,7 +13,7 @@ class ConfigFormFactory implements FactoryInterface
         $form = new ConfigForm();
         $globalSettings = $container->get('Omeka\Settings');
         $form->setGlobalSettings($globalSettings);
-        
+
         return $form;
     }
 }

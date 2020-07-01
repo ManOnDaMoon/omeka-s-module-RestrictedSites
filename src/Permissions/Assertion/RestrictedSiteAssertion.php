@@ -1,10 +1,10 @@
 <?php
 namespace RestrictedSites\Permissions\Assertion;
 
-use Zend\Permissions\Acl\Acl;
-use Zend\Permissions\Acl\Assertion\AssertionInterface;
-use Zend\Permissions\Acl\Resource\ResourceInterface;
-use Zend\Permissions\Acl\Role\RoleInterface;
+use Laminas\Permissions\Acl\Acl;
+use Laminas\Permissions\Acl\Assertion\AssertionInterface;
+use Laminas\Permissions\Acl\Resource\ResourceInterface;
+use Laminas\Permissions\Acl\Role\RoleInterface;
 
 class RestrictedSiteAssertion implements AssertionInterface
 {
@@ -12,7 +12,7 @@ class RestrictedSiteAssertion implements AssertionInterface
      * Unused
      *
      * {@inheritDoc}
-     * @see \Zend\Permissions\Acl\Assertion\AssertionInterface::assert()
+     * @see \Laminas\Permissions\Acl\Assertion\AssertionInterface::assert()
      */
     public function assert(
         Acl $acl,
