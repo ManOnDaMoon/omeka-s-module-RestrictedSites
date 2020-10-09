@@ -8,7 +8,7 @@ Anonymous users are redirected to a standard public-facing login page, without t
 
 ## Installing / Getting started
 
-RestrictedSites is compatible with Omeka-S v2.
+Starting v2.0, RestrictedSites requires Omeka S v3 or greater.
 
 * Download and unzip in your `omeka-s/modules` directory.
 * Rename the uncompressed folder to `RestrictedSites`.
@@ -21,7 +21,7 @@ This module includes the following features:
 
 * Restrict access of public sites to a list of registered users
 * Public-facing login form included in your public site theme, including a checkbox option to remember the user session
-* Site-specific password reset forms and e-mails: users are no longer redirected to the admin backend to create a new password 
+* Site-specific password reset forms and e-mails: users are no longer redirected to the admin backend to create a new password
 * Custom Log out link that does not redirect to admin backend
 * Ability to hide features (e.g. search form) from anonymous user
 * Full compatibility with module UserNames to allow the use of username identifiers on your sites: https://github.com/ManOnDaMoon/omeka-s-module-UserNames
@@ -81,7 +81,7 @@ To do so, in any view template, surround the elements you want to hide to non-re
 ### Custom log out link
 A custom log out link is available to add to your site `Navigation` configuration. This link terminates the user's session and redirects to the site login form, but does not display the admin backend login form.
 
-This navigation link is compatible with the RoleBasedNavigation module: if installed, you can select which roles are able to see the Logout link. Typically select all global roles to hide it only from unregistered users. 
+This navigation link is compatible with the RoleBasedNavigation module: if installed, you can select which roles are able to see the Logout link. Typically select all global roles to hide it only from unregistered users.
 
 ## Module configuration
 
