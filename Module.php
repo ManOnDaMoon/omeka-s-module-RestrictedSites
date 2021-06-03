@@ -21,7 +21,8 @@ class Module extends AbstractModule
     protected $excludedRoutes = array('sitelogin',
         'sitelogout',
         'sitelogin/forgot-password',
-        'sitelogin/create-password'
+        'sitelogin/create-password',
+        'site/css-editor'
     );
 
     /**

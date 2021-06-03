@@ -72,9 +72,7 @@ class SiteLoginController extends AbstractActionController
                 $registeredUserId = $registeredUser->id();
                 if ($registeredUserId == $userId) {
                     // Authorized user, redirecting to site.
-                    return $this->redirect()->toRoute('site', array(
-                        'site-slug' => $siteSlug
-                    ));
+                    return $this->redirect()->toRoute('site', ['action' => 'index'], true);
                 }
             }
             // Non authorized user, sending Forbidden error code
@@ -111,9 +109,7 @@ class SiteLoginController extends AbstractActionController
                     if ($redirectUrl = $session->offsetGet('redirect_url')) {
                         return $this->redirect()->toUrl($redirectUrl);
                     }
-                    return $this->redirect()->toRoute('site', array(
-                        'site-slug' => $siteSlug
-                    ));
+                    return $this->redirect()->toRoute('site', ['action' => 'index'], true);
                 } else {
                     if ($this->useUserNames) {
                         $this->messenger()->addError('User name, email, or password is invalid'); // @translate
