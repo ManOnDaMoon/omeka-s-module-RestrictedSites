@@ -19,8 +19,7 @@ class RestrictedSiteAssertion implements AssertionInterface
         RoleInterface $role = null,
         ResourceInterface $resource = null,
         $privilege = null
-    )
-    {
+    ) {
         return true;
     }
 }

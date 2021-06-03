@@ -15,7 +15,7 @@ class ConfigForm extends Form
             'name' => 'restrictedsites_custom_email',
             'options' => [
                 'label' => 'Use custom user validation email', // @translate
-                'info' => 'Upon user creation, activation email will refer and contain a link to the default site instead of the admin dashboard.' // @translate
+                'info' => 'Upon user creation, activation email will refer and contain a link to the default site instead of the admin dashboard.', // @translate
             ],
             'attributes' => [
                 'checked' => $this->globalSettings->get('restrictedsites_custom_email') ? 'checked' : '',

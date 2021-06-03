@@ -8,7 +8,6 @@ use RoleBasedNavigation\Module;
 
 class Logout implements LinkInterface
 {
-
     /**
      * Get the link type name.
      *
@@ -40,12 +39,12 @@ class Logout implements LinkInterface
                 return []; // equivalent to empty selection
             } else {
                 return [
-                    Module::RBN_AUTHENTICATED_USERS
+                    Module::RBN_AUTHENTICATED_USERS,
                 ];
             }
         } elseif (in_array(Module::RBN_UNAUTHENTICATED_VISITORS, $roleSelectors)) {
             return [
-                Module::RBN_UNAUTHENTICATED_VISITORS
+                Module::RBN_UNAUTHENTICATED_VISITORS,
             ];
         } else {
             return $roleSelectors;
@@ -87,8 +86,8 @@ class Logout implements LinkInterface
         $result = [
             'route' => 'sitelogout',
             'params' => [
-                'site-slug' => $site->slug()
-            ]
+                'site-slug' => $site->slug(),
+            ],
         ];
 
         // RoleBasedNavigation compatibility:
@@ -109,7 +108,7 @@ class Logout implements LinkInterface
     public function toJstree(array $data, SiteRepresentation $site)
     {
         $result = [
-            'label' => $data['label']
+            'label' => $data['label'],
         ];
 
         // RoleBasedNavigation compatibility:

@@ -7,7 +7,6 @@ use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class SiteLoginControllerFactory implements FactoryInterface
 {
-
     /**
      * Instantiate sitelogin controller class with access to Authentication
      * Service

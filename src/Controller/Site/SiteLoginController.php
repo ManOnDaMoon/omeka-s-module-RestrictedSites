@@ -16,13 +16,10 @@ use Laminas\Mvc\MvcEvent;
  * marked as restricted to a limited user list
  *
  * @author laurent
- *
  */
 class SiteLoginController extends AbstractActionController
 {
-
     /**
-     *
      * @var AuthenticationService
      */
     protected $auth;
@@ -33,8 +30,7 @@ class SiteLoginController extends AbstractActionController
     protected $entityManager;
 
     /**
-     *
-     * @var boolean
+     * @var bool
      */
     protected $useUserNames = false;
 
@@ -154,7 +150,7 @@ class SiteLoginController extends AbstractActionController
             $this->messenger()->addSuccess('Successfully logged out'); // @translate
         } else {
             // Visitor not logged in, redirect to home page
-            $this->redirect()->toRoute('site', array('site-slug' => $this->currentSite()->slug()));
+            $this->redirect()->toRoute('site', ['site-slug' => $this->currentSite()->slug()]);
         }
 
         /** @var \Laminas\View\Model\ViewModel $view */
@@ -167,7 +163,6 @@ class SiteLoginController extends AbstractActionController
         return $view;
     }
 
-
     public function forgotPasswordAction()
     {
         /** @var \Omeka\Api\Representation\SiteRepresentation $site */
@@ -176,9 +171,9 @@ class SiteLoginController extends AbstractActionController
         $siteName = $site->title();
 
         if ($this->auth->hasIdentity()) {
-            return $this->redirect()->toRoute('site', array(
-                'site-slug' => $siteSlug
-            ));
+            return $this->redirect()->toRoute('site', [
+                'site-slug' => $siteSlug,
+            ]);
         }
 
         $form = $this->getForm(\Omeka\Form\ForgotPasswordForm::class);
@@ -206,7 +201,7 @@ class SiteLoginController extends AbstractActionController
                     $siteMailer->sendSiteResetPassword($user, $siteSlug, $siteName);
                 }
                 $this->messenger()->addSuccess('Check your email for instructions on how to reset your password'); // @translate
-                return $this->redirect()->toRoute('sitelogin', array('site-slug' => $this->currentSite()->slug()));
+                return $this->redirect()->toRoute('sitelogin', ['site-slug' => $this->currentSite()->slug()]);
             } else {
                 $this->messenger()->addError('Activation unsuccessful'); // @translate
             }
@@ -224,9 +219,9 @@ class SiteLoginController extends AbstractActionController
         $siteSlug = $site->slug();
 
         if ($this->auth->hasIdentity()) {
-            return $this->redirect()->toRoute('site', array(
-                'site-slug' => $siteSlug
-            ));
+            return $this->redirect()->toRoute('site', [
+                'site-slug' => $siteSlug,
+            ]);
         }
 
         $passwordCreation = $this->entityManager->find(
@@ -236,9 +231,9 @@ class SiteLoginController extends AbstractActionController
 
         if (!$passwordCreation) {
             $this->messenger()->addError('Invalid password creation key.'); // @translate
-            return $this->redirect()->toRoute('sitelogin', array(
-                'site-slug' => $siteSlug
-            ));
+            return $this->redirect()->toRoute('sitelogin', [
+                'site-slug' => $siteSlug,
+            ]);
         }
         $user = $passwordCreation->getUser();
 
@@ -247,9 +242,9 @@ class SiteLoginController extends AbstractActionController
             $this->entityManager->remove($passwordCreation);
             $this->entityManager->flush();
             $this->messenger()->addError('Password creation key expired.'); // @translate
-            return $this->redirect()->toRoute('sitelogin', array(
-                'site-slug' => $siteSlug
-            ));
+            return $this->redirect()->toRoute('sitelogin', [
+                'site-slug' => $siteSlug,
+            ]);
         }
 
         $form = $this->getForm(ActivateForm::class);
@@ -265,9 +260,9 @@ class SiteLoginController extends AbstractActionController
                 $this->entityManager->remove($passwordCreation);
                 $this->entityManager->flush();
                 $this->messenger()->addSuccess('Successfully created your password. Please log in.'); // @translate
-                return $this->redirect()->toRoute('sitelogin', array(
-                    'site-slug' => $siteSlug
-                ));
+                return $this->redirect()->toRoute('sitelogin', [
+                    'site-slug' => $siteSlug,
+                ]);
             } else {
                 $this->messenger()->addError('Password creation unsuccessful'); // @translate
             }
