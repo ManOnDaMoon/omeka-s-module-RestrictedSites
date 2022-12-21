@@ -105,9 +105,13 @@ Some code and logic based on other Omeka-S modules:
 * MetaDataBrowse: https://github.com/omeka-s-modules/MetadataBrowse
 * Omeka-S main repository: https://github.com/omeka/omeka-s
 
-Check out the UserNames module for more info: https://github.com/ManOnDaMoon/omeka-s-module-UserNames
+Check out my other modules:
 
-Check out the RoleBasedNavigation module for more info: https://github.com/ManOnDaMoon/omeka-s-module-RoleBasedNavigation
+* RestrictedSites: https://github.com/ManOnDaMoon/omeka-s-module-RestrictedSites
+* UserNames: https://github.com/ManOnDaMoon/omeka-s-module-UserNames
+* RoleBasedNavigation: https://github.com/ManOnDaMoon/omeka-s-module-RoleBasedNavigation
+* Sitemaps: https://github.com/ManOnDaMoon/omeka-s-module-Sitemaps
+* Siteswitcher: https://github.com/ManOnDaMoon/omeka-s-module-SiteSwitcher
 
 ## Licensing
 
