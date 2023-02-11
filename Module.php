@@ -237,22 +237,16 @@ class Module extends AbstractModule
         $form = $event->getTarget();
 
         $siteSettings = $form->getSiteSettings();
+        $options = $form->getOptions();
+        $options['element_groups']['restrictedsites'] = 'Restricted sites';
+        $form->setOption('element_groups', $options['element_groups']);
 
-        $form->add([
-            'type' => 'fieldset',
-            'name' => 'restrictedsites',
-            'options' => [
-                'label' => 'Restricted Sites', // @translate
-            ],
-        ]);
-
-        $rsFieldset = $form->get('restrictedsites');
-
-        $rsFieldset->add(
+        $form->add(
             [
                         'name' => 'restrictedsites_restricted',
                         'type' => 'Checkbox',
                         'options' => [
+                                'element_group' => 'restrictedsites',
                                 'label' => 'Restrict access to this site\'s user list', // @translate
                                 'info' => 'Activates front-end login, logout and password reset UI for this site. Your site visibility must be set to Visible (in Site info pannel) for this feature to work properly.', // @translate
                         ],
